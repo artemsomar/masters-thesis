@@ -4,6 +4,7 @@ from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 from app.config import Settings, get_settings
+from app.infrastructure.embeddings.gemini_embedding_client import GeminiEmbeddingClient
 from app.infrastructure.events.redis_session_events import RedisSessionEventBroker
 from app.infrastructure.llm.gemini_structured_client import GeminiStructuredOutputClient
 from app.infrastructure.queue.rq_session_dispatcher import RqSessionJobDispatcher
@@ -14,8 +15,11 @@ from app.infrastructure.repositories.redis_session_repository import RedisSessio
 from app.logging_config import configure_logging
 from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.service import DiagramService
+from app.modules.evaluation.dataset_reader import EvaluationDatasetReader
+from app.modules.evaluation.service import EvaluationService
 from app.modules.sessions.service import SessionService
 from app.workflows.diagram_session_workflow import DiagramSessionWorkflow
+from app.workflows.evaluation_workflow import EvaluationWorkflow
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +32,13 @@ class ApplicationContainer:
     clarification_service: ClarificationService
     diagram_service: DiagramService
     diagram_session_workflow: DiagramSessionWorkflow
+
+
+@dataclass(frozen=True, slots=True)
+class EvaluationContainer:
+    settings: Settings
+    evaluation_service: EvaluationService
+    evaluation_workflow: EvaluationWorkflow
 
 
 def build_container(settings: Settings | None = None) -> ApplicationContainer:
@@ -80,4 +91,31 @@ def build_container(settings: Settings | None = None) -> ApplicationContainer:
             diagram_service,
             resolved_settings.max_clarification_rounds,
         ),
+    )
+
+
+def build_evaluation_container(
+    actor_similarity_threshold: float,
+    use_case_similarity_threshold: float,
+    settings: Settings | None = None,
+) -> EvaluationContainer:
+    resolved_settings = settings or get_settings()
+    configure_logging(resolved_settings.log_level)
+    llm_client = GeminiStructuredOutputClient(
+        resolved_settings.gemini_api_key, resolved_settings.gemini_model
+    )
+    embedding_client = GeminiEmbeddingClient(
+        resolved_settings.gemini_api_key, resolved_settings.gemini_embedding_model
+    )
+    evaluation_service = EvaluationService(
+        EvaluationDatasetReader(),
+        embedding_client,
+        resolved_settings.max_description_length,
+        actor_similarity_threshold,
+        use_case_similarity_threshold,
+    )
+    return EvaluationContainer(
+        settings=resolved_settings,
+        evaluation_service=evaluation_service,
+        evaluation_workflow=EvaluationWorkflow(DiagramService(llm_client), evaluation_service),
     )

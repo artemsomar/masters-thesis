@@ -13,8 +13,11 @@ __pycache__/
 dist/
 build/
 docs/
+data/
 
 # Frontend
 node_modules/
 .next/
 coverage/
+
+.DS_Store
