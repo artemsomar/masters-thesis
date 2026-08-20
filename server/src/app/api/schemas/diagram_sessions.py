@@ -4,6 +4,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.modules.sessions.enums import SessionStatus
+
 DiagramIdentifier = Annotated[
     str,
     Field(
@@ -15,19 +17,8 @@ DiagramIdentifier = Annotated[
 ]
 
 
-class ApiModel(BaseModel):
+class ApiSchema(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-
-
-class DiagramSessionStatus(StrEnum):
-    CREATED = "created"
-    ANALYZING = "analyzing"
-    AWAITING_ANSWERS = "awaiting_answers"
-    GENERATING_DIAGRAM = "generating_diagram"
-    DIAGRAM_READY = "diagram_ready"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
-    EXPIRED = "expired"
 
 
 class NextAction(StrEnum):
@@ -37,21 +28,21 @@ class NextAction(StrEnum):
     CREATE_NEW_SESSION = "create_new_session"
 
 
-class CreateDiagramSessionRequest(ApiModel):
+class CreateDiagramSessionRequest(ApiSchema):
     description: str = Field(min_length=1)
     language: str = Field(min_length=2, max_length=10)
 
 
-class CreateDiagramSessionResponse(ApiModel):
+class CreateDiagramSessionResponse(ApiSchema):
     session_id: str = Field(serialization_alias="sessionId")
     session_token: str = Field(serialization_alias="sessionToken")
-    status: DiagramSessionStatus
+    status: SessionStatus
     expires_at: datetime = Field(serialization_alias="expiresAt")
 
 
-class SessionStatusResponse(ApiModel):
+class SessionStatusResponse(ApiSchema):
     session_id: str = Field(serialization_alias="sessionId")
-    status: DiagramSessionStatus
+    status: SessionStatus
     next_action: NextAction = Field(serialization_alias="nextAction")
     updated_at: datetime = Field(serialization_alias="updatedAt")
 
@@ -62,7 +53,7 @@ class QuestionType(StrEnum):
     FREE_TEXT = "free_text"
 
 
-class Question(ApiModel):
+class Question(ApiSchema):
     id: str
     text: str
     type: QuestionType
@@ -70,23 +61,23 @@ class Question(ApiModel):
     options: list[str] = Field(default_factory=list)
 
 
-class QuestionsResponse(ApiModel):
+class QuestionsResponse(ApiSchema):
     round: int = Field(ge=1)
     questions: list[Question]
 
 
-class Answer(ApiModel):
+class Answer(ApiSchema):
     question_id: str = Field(serialization_alias="questionId")
     value: str | list[str] | bool
 
 
-class SubmitAnswersRequest(ApiModel):
+class SubmitAnswersRequest(ApiSchema):
     round: int = Field(ge=1)
     answers: list[Answer]
 
 
-class SubmitAnswersResponse(ApiModel):
-    status: DiagramSessionStatus
+class SubmitAnswersResponse(ApiSchema):
+    status: SessionStatus
 
 
 class ActorType(StrEnum):
@@ -101,29 +92,29 @@ class RelationType(StrEnum):
     GENERALIZATION = "generalization"
 
 
-class Actor(ApiModel):
+class Actor(ApiSchema):
     id: DiagramIdentifier
     name: str
     type: ActorType
 
 
-class UseCase(ApiModel):
+class UseCase(ApiSchema):
     id: DiagramIdentifier
     name: str
 
 
-class Relation(ApiModel):
+class Relation(ApiSchema):
     type: RelationType
     source_id: DiagramIdentifier = Field(serialization_alias="sourceId")
     target_id: DiagramIdentifier = Field(serialization_alias="targetId")
 
 
-class DiagramSystem(ApiModel):
+class DiagramSystem(ApiSchema):
     id: DiagramIdentifier
     name: str
 
 
-class Diagram(ApiModel):
+class Diagram(ApiSchema):
     schema_version: Literal["1.0"] = Field(serialization_alias="schemaVersion")
     system: DiagramSystem
     actors: list[Actor]
@@ -133,14 +124,14 @@ class Diagram(ApiModel):
     warnings: list[str]
 
 
-class SessionStatusEvent(ApiModel):
-    status: DiagramSessionStatus
+class SessionStatusEvent(ApiSchema):
+    status: SessionStatus
 
 
-class ErrorBody(ApiModel):
+class ErrorBody(ApiSchema):
     code: str
     message: str
 
 
-class ErrorResponse(ApiModel):
+class ErrorResponse(ApiSchema):
     error: ErrorBody
