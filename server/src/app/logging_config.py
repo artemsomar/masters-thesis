@@ -9,6 +9,7 @@ def configure_logging(log_level: str) -> None:
 
     structlog.configure(
         processors=[
+            structlog.contextvars.merge_contextvars,
             structlog.stdlib.filter_by_level,
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
@@ -21,3 +22,8 @@ def configure_logging(log_level: str) -> None:
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
+
+
+def get_correlation_id() -> str | None:
+    value = structlog.contextvars.get_contextvars().get("correlation_id")
+    return value if isinstance(value, str) else None

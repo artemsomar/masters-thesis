@@ -3,9 +3,13 @@ from fastapi.responses import JSONResponse
 
 from app.errors import AppError
 from app.modules.sessions.errors import (
+    InvalidQuestionRound,
     InvalidSessionState,
     InvalidSessionToken,
+    QuestionsNotAvailable,
     SessionNotFound,
+    SessionCreationRateLimitExceeded,
+    TooManyActiveSessions,
 )
 
 
@@ -14,8 +18,10 @@ def status_code_for(error: AppError) -> int:
         return 404
     if isinstance(error, InvalidSessionToken):
         return 401
-    if isinstance(error, InvalidSessionState):
+    if isinstance(error, (InvalidSessionState, InvalidQuestionRound, QuestionsNotAvailable)):
         return 409
+    if isinstance(error, (SessionCreationRateLimitExceeded, TooManyActiveSessions)):
+        return 429
     return 400
 
 

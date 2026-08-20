@@ -5,6 +5,7 @@ from redis.asyncio import Redis
 
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.models import DiagramSession
+from app.modules.sessions.schemas import Answer, Question
 
 
 class RedisSessionRepository:
@@ -38,6 +39,14 @@ class RedisSessionRepository:
                 "language": session.language,
                 "status": session.status,
                 "currentJobId": session.current_job_id,
+                "questionRound": session.question_round,
+                "questions": [question.model_dump() for question in session.questions],
+                "answers": [answer.model_dump(by_alias=True) for answer in session.answers],
+                "analysisFacts": session.analysis_facts,
+                "analysisPromptVersion": session.analysis_prompt_version,
+                "diagram": session.diagram_json,
+                "diagramPromptVersion": session.diagram_prompt_version,
+                "errorCode": session.error_code,
                 "createdAt": session.created_at.isoformat(),
                 "updatedAt": session.updated_at.isoformat(),
                 "expiresAt": session.expires_at.isoformat(),
@@ -53,6 +62,16 @@ class RedisSessionRepository:
             language=payload["language"],
             status=SessionStatus(payload["status"]),
             current_job_id=payload["currentJobId"],
+            question_round=payload.get("questionRound", 0),
+            questions=[
+                Question.model_validate(question) for question in payload.get("questions", [])
+            ],
+            answers=[Answer.model_validate(answer) for answer in payload.get("answers", [])],
+            analysis_facts=payload.get("analysisFacts", []),
+            analysis_prompt_version=payload.get("analysisPromptVersion"),
+            diagram_json=payload.get("diagram"),
+            diagram_prompt_version=payload.get("diagramPromptVersion"),
+            error_code=payload.get("errorCode"),
             created_at=datetime.fromisoformat(payload["createdAt"]),
             updated_at=datetime.fromisoformat(payload["updatedAt"]),
             expires_at=datetime.fromisoformat(payload["expiresAt"]),

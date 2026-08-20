@@ -6,6 +6,7 @@ authors = [{ name = "Master Thesis" }]
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "fastapi (>=0.115,<1.0)",
+  "google-genai (>=1.33,<2.0)",
   "pydantic-settings (>=2.7,<3.0)",
   "redis (>=5.2,<7.0)",
   "rq (>=2.3,<3.0)",
@@ -39,7 +40,7 @@ explicit_package_bases = true
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 
 [[tool.mypy.overrides]]
-module = ["rq.*"]
+module = ["google.*", "rq.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

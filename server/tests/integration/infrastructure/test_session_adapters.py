@@ -14,6 +14,7 @@ from app.infrastructure.repositories.redis_session_repository import RedisSessio
 from app.infrastructure.events.redis_session_events import RedisSessionEventBroker
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.models import DiagramSession
+from app.modules.sessions.schemas import SessionStatusUpdate
 
 _REDIS_URL = os.getenv("TEST_REDIS_URL", "redis://localhost:6379/15")
 
@@ -66,7 +67,9 @@ def test_redis_event_broker_publishes_status_events() -> None:
         try:
             async with client.pubsub() as subscription:
                 await subscription.subscribe(f"diagram-session-events:{session_id}")
-                await broker.publish_status(session_id, SessionStatus.ANALYZING)
+                await broker.publish_status(
+                    session_id, SessionStatusUpdate(status=SessionStatus.ANALYZING)
+                )
                 message = await _next_message(subscription)
 
             assert message is not None

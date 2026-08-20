@@ -8,7 +8,7 @@ def run() -> None:
     container = build_container()
     connection = Redis.from_url(str(container.settings.redis_url))
     queue = Queue(container.settings.rq_queue_name, connection=connection)
-    Worker([queue], connection=connection).work()
+    Worker([queue], connection=connection).work(with_scheduler=True)
 
 
 if __name__ == "__main__":

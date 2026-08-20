@@ -21,7 +21,7 @@ def test_rq_dispatcher_enqueues_a_session_job() -> None:
 
     job_id = str(uuid4())
     queue = Queue("test-diagram-jobs", connection=connection)
-    dispatcher = RqSessionJobDispatcher(connection, queue.name)
+    dispatcher = RqSessionJobDispatcher(connection, queue.name, 120, 3, [10, 20])
     dispatcher.dispatch_session_processing("session-id", job_id)
 
     job = queue.fetch_job(job_id)

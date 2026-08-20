@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
+from uuid import UUID, uuid4
 
 import structlog
 from fastapi import FastAPI
+from starlette.middleware.base import RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
 
 from app.api.exception_handlers import register_exception_handlers
 from app.api.routes.diagram_sessions import router as diagram_sessions_router
@@ -29,6 +33,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         version="0.1.0",
         lifespan=lifespan,
     )
+
+    @app.middleware("http")
+    async def bind_request_context(
+        request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
+        correlation_id = _correlation_id(request.headers.get("X-Request-ID"))
+        structlog.contextvars.bind_contextvars(correlation_id=correlation_id)
+        try:
+            response = await call_next(request)
+            response.headers["X-Request-ID"] = correlation_id
+            return response
+        finally:
+            structlog.contextvars.clear_contextvars()
+
     app.state.container = container
     register_exception_handlers(app)
     app.include_router(health_router)
@@ -37,3 +55,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
 
 app = create_app()
+
+
+def _correlation_id(value: str | None) -> str:
+    if value is not None:
+        try:
+            return str(UUID(value))
+        except ValueError:
+            pass
+    return str(uuid4())
