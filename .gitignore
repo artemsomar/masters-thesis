@@ -1,0 +1,20 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Backend
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.coverage
+dist/
+build/
+docs/
+
+# Frontend
+node_modules/
+.next/
+coverage/

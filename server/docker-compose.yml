@@ -1,0 +1,29 @@
+services:
+  api:
+    build: .
+    environment:
+      APP_ENVIRONMENT: development
+      APP_REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: python -m app.workers.runner
+    environment:
+      APP_ENVIRONMENT: development
+      APP_REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
