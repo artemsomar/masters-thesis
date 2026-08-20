@@ -4,7 +4,7 @@ import json
 import httpx
 import pytest
 
-from app.modules.analysis.schemas import AnalysisResult
+from app.modules.clarifications.schemas import ClarificationResult
 from tests.api.diagram_sessions_app import create_test_app
 
 
@@ -39,7 +39,7 @@ def test_session_endpoints_require_a_token_and_delete_the_session() -> None:
 @pytest.mark.api
 def test_diagram_endpoint_returns_pending_then_a_valid_diagram() -> None:
     async def scenario() -> None:
-        app = create_test_app(AnalysisResult(facts=["Clients can book services"]))
+        app = create_test_app(ClarificationResult())
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
             created = await client.post(
@@ -122,6 +122,8 @@ def test_questions_and_answers_follow_the_current_round_contract() -> None:
                     ],
                 },
             )
+            await app.state.container.diagram_session_workflow.process_session(session_id)
+            stored = await app.state.container.session_service.get(session_id)
             repeated = await client.post(
                 f"/api/v1/diagram-sessions/{session_id}/answers",
                 headers=headers,
@@ -140,7 +142,37 @@ def test_questions_and_answers_follow_the_current_round_contract() -> None:
             ],
         }
         assert submitted.status_code == 202
-        assert submitted.json() == {"status": "generating_diagram"}
+        assert submitted.json() == {"status": "analyzing"}
+        assert stored.clarification_history[0].question == "How is a booking confirmed?"
+        assert stored.clarification_history[0].answer == "By email"
+        assert "Question: How is a booking confirmed?" in (
+            app.state.container.clarification_llm_client.calls[1][0]
+        )
+        assert "Answer: By email" in app.state.container.clarification_llm_client.calls[1][0]
         assert repeated.status_code == 409
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.api
+def test_disabled_clarifications_skip_the_clarification_llm_call() -> None:
+    async def scenario() -> None:
+        app = create_test_app()
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+            created = await client.post(
+                "/api/v1/diagram-sessions",
+                json={
+                    "description": "A booking system",
+                    "language": "en",
+                    "clarificationsEnabled": False,
+                },
+            )
+            payload = created.json()
+            await app.state.container.diagram_session_workflow.process_session(payload["sessionId"])
+
+        assert payload["status"] == "generating_diagram"
+        assert app.state.container.clarification_llm_client.calls == []
+        assert len(app.state.container.diagram_llm_client.calls) == 1
 
     asyncio.run(scenario())

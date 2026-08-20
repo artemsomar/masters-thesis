@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from app.modules.sessions.enums import SessionStatus
-from app.modules.sessions.schemas import Answer, Question
+from app.modules.sessions.schemas import ClarificationHistoryEntry, Question
 
 
 @dataclass(slots=True)
@@ -11,6 +11,7 @@ class DiagramSession:
     token_hash: str
     description: str
     language: str
+    clarifications_enabled: bool
     status: SessionStatus
     created_at: datetime
     updated_at: datetime
@@ -18,9 +19,8 @@ class DiagramSession:
     current_job_id: str | None = None
     question_round: int = 0
     questions: list[Question] = field(default_factory=list)
-    answers: list[Answer] = field(default_factory=list)
-    analysis_facts: list[str] = field(default_factory=list)
-    analysis_prompt_version: str | None = None
+    clarification_history: list[ClarificationHistoryEntry] = field(default_factory=list)
+    clarification_prompt_version: str | None = None
     diagram_json: str | None = None
     diagram_prompt_version: str | None = None
     error_code: str | None = None

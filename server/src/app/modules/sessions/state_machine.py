@@ -1,7 +1,9 @@
 from app.modules.sessions.enums import SessionStatus
 
 _ALLOWED_TRANSITIONS: dict[SessionStatus, frozenset[SessionStatus]] = {
-    SessionStatus.CREATED: frozenset({SessionStatus.ANALYZING, SessionStatus.CANCELLED}),
+    SessionStatus.CREATED: frozenset(
+        {SessionStatus.ANALYZING, SessionStatus.GENERATING_DIAGRAM, SessionStatus.CANCELLED}
+    ),
     SessionStatus.ANALYZING: frozenset(
         {
             SessionStatus.AWAITING_ANSWERS,
@@ -11,7 +13,7 @@ _ALLOWED_TRANSITIONS: dict[SessionStatus, frozenset[SessionStatus]] = {
         }
     ),
     SessionStatus.AWAITING_ANSWERS: frozenset(
-        {SessionStatus.GENERATING_DIAGRAM, SessionStatus.FAILED, SessionStatus.CANCELLED}
+        {SessionStatus.ANALYZING, SessionStatus.FAILED, SessionStatus.CANCELLED}
     ),
     SessionStatus.GENERATING_DIAGRAM: frozenset(
         {

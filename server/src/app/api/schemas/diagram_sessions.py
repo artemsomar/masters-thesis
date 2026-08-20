@@ -14,6 +14,7 @@ class ApiSchema(BaseModel):
 class CreateDiagramSessionRequest(ApiSchema):
     description: str = Field(min_length=1)
     language: str = Field(min_length=2, max_length=10)
+    clarifications_enabled: bool = Field(default=True, validation_alias="clarificationsEnabled")
 
 
 class CreateDiagramSessionResponse(ApiSchema):

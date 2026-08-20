@@ -5,7 +5,7 @@ from redis.asyncio import Redis
 
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.models import DiagramSession
-from app.modules.sessions.schemas import Answer, Question
+from app.modules.sessions.schemas import ClarificationHistoryEntry, Question
 
 
 class RedisSessionRepository:
@@ -37,13 +37,15 @@ class RedisSessionRepository:
                 "tokenHash": session.token_hash,
                 "description": session.description,
                 "language": session.language,
+                "clarificationsEnabled": session.clarifications_enabled,
                 "status": session.status,
                 "currentJobId": session.current_job_id,
                 "questionRound": session.question_round,
                 "questions": [question.model_dump() for question in session.questions],
-                "answers": [answer.model_dump(by_alias=True) for answer in session.answers],
-                "analysisFacts": session.analysis_facts,
-                "analysisPromptVersion": session.analysis_prompt_version,
+                "clarificationHistory": [
+                    entry.model_dump() for entry in session.clarification_history
+                ],
+                "clarificationPromptVersion": session.clarification_prompt_version,
                 "diagram": session.diagram_json,
                 "diagramPromptVersion": session.diagram_prompt_version,
                 "errorCode": session.error_code,
@@ -60,15 +62,18 @@ class RedisSessionRepository:
             token_hash=payload["tokenHash"],
             description=payload["description"],
             language=payload["language"],
+            clarifications_enabled=payload.get("clarificationsEnabled", True),
             status=SessionStatus(payload["status"]),
             current_job_id=payload["currentJobId"],
             question_round=payload.get("questionRound", 0),
             questions=[
                 Question.model_validate(question) for question in payload.get("questions", [])
             ],
-            answers=[Answer.model_validate(answer) for answer in payload.get("answers", [])],
-            analysis_facts=payload.get("analysisFacts", []),
-            analysis_prompt_version=payload.get("analysisPromptVersion"),
+            clarification_history=[
+                ClarificationHistoryEntry.model_validate(entry)
+                for entry in payload.get("clarificationHistory", [])
+            ],
+            clarification_prompt_version=payload.get("clarificationPromptVersion"),
             diagram_json=payload.get("diagram"),
             diagram_prompt_version=payload.get("diagramPromptVersion"),
             error_code=payload.get("errorCode"),

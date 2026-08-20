@@ -2,6 +2,7 @@ import hmac
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
+from app.modules.sessions.answer_validation import validate_answer_submission
 from app.modules.sessions.errors import (
     InvalidQuestionRound,
     InvalidSessionState,
@@ -14,7 +15,7 @@ from app.modules.sessions.models import DiagramSession
 from app.modules.sessions.ports import SessionCreationLimiter, SessionEventPublisher
 from app.modules.sessions.repository import SessionRepository
 from app.modules.sessions.input_validation import validate_answers, validate_description
-from app.modules.sessions.schemas import Answer, Question
+from app.modules.sessions.schemas import Answer, ClarificationHistoryEntry, Question
 from app.modules.sessions.state_machine import is_allowed
 from app.modules.sessions.status_events import publish_status
 from app.modules.sessions.tokens import create_token, hash_token
@@ -40,7 +41,11 @@ class SessionService:
         self._max_answer_length = max_answer_length
 
     async def create(
-        self, description: str, language: str, client_address: str
+        self,
+        description: str,
+        language: str,
+        client_address: str,
+        clarifications_enabled: bool = True,
     ) -> tuple[DiagramSession, str]:
         validate_description(description, self._max_description_length)
         token = create_token()
@@ -50,6 +55,7 @@ class SessionService:
             token_hash=hash_token(token, self._token_pepper),
             description=description,
             language=language,
+            clarifications_enabled=clarifications_enabled,
             status=SessionStatus.CREATED,
             created_at=now,
             updated_at=now,
@@ -91,10 +97,9 @@ class SessionService:
         await self._repository.save(session)
         return session
 
-    async def save_analysis_result(
+    async def save_clarification_result(
         self,
         session_id: str,
-        facts: list[str],
         questions: list[Question],
         prompt_version: str,
     ) -> DiagramSession:
@@ -103,8 +108,7 @@ class SessionService:
         status_changed = session.status is not target
         if status_changed and not is_allowed(session.status, target):
             raise InvalidSessionState()
-        session.analysis_facts = facts
-        session.analysis_prompt_version = prompt_version
+        session.clarification_prompt_version = prompt_version
         session.questions = questions
         if questions:
             session.question_round += 1
@@ -130,10 +134,20 @@ class SessionService:
             raise QuestionsNotAvailable()
         if session.question_round != question_round:
             raise InvalidQuestionRound()
+        validate_answer_submission(session.questions, answers)
         validate_answers(answers, self._max_answer_length)
-        session.answers.extend(answers)
+        answers_by_question_id = {answer.question_id: answer.value for answer in answers}
+        session.clarification_history.extend(
+            ClarificationHistoryEntry(
+                round=session.question_round,
+                question=question.text,
+                answer=answers_by_question_id[question.id],
+            )
+            for question in session.questions
+            if question.id in answers_by_question_id
+        )
         session.questions = []
-        session.status = SessionStatus.GENERATING_DIAGRAM
+        session.status = SessionStatus.ANALYZING
         self._touch(session)
         await self._repository.save(session)
         await self._publish_status(session)

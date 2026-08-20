@@ -2,17 +2,16 @@ import asyncio
 
 import pytest
 
-from app.modules.analysis.schemas import AnalysisResult
-from app.modules.analysis.service import RequirementsAnalysisService
+from app.modules.clarifications.schemas import ClarificationResult
+from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.enums import ActorType, RelationType
 from app.modules.diagrams.schemas import Actor, AssociationRelation, Diagram, DiagramSystem, UseCase
 from app.modules.diagrams.service import DiagramService
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.service import SessionService
 from app.workflows.diagram_session_workflow import DiagramSessionWorkflow
+from tests.fakes.fake_llm import FakeStructuredLlmClient
 from tests.fakes.fake_sessions import (
-    FakeDiagramGenerator,
-    FakeRequirementsAnalyzer,
     FakeSessionEventBroker,
     FakeSessionCreationLimiter,
     FakeSessionJobDispatcher,
@@ -35,9 +34,9 @@ def test_invalid_generated_diagram_marks_the_session_as_failed() -> None:
         workflow = DiagramSessionWorkflow(
             session_service,
             FakeSessionJobDispatcher(),
-            RequirementsAnalysisService(FakeRequirementsAnalyzer(AnalysisResult()), 7),
-            DiagramService(FakeDiagramGenerator(_invalid_diagram())),
-            max_analysis_rounds=3,
+            ClarificationService(FakeStructuredLlmClient(ClarificationResult()), 7),
+            DiagramService(FakeStructuredLlmClient(_invalid_diagram())),
+            max_clarification_rounds=3,
         )
         session, _ = await session_service.create("A booking system", "en", "127.0.0.1")
         await session_service.transition(session.id, SessionStatus.ANALYZING)

@@ -6,8 +6,7 @@ from rq import get_current_job
 from rq.job import Job
 
 from app.bootstrap import build_container
-from app.modules.analysis.errors import AnalysisProviderError
-from app.modules.diagrams.errors import DiagramProviderError
+from app.infrastructure.llm.client import LlmProviderError
 from app.modules.sessions.errors import SessionNotFound
 
 logger = structlog.get_logger(__name__)
@@ -20,7 +19,7 @@ def process_session(session_id: str) -> None:
     container = build_container()
     try:
         asyncio.run(container.diagram_session_workflow.process_session(session_id))
-    except (AnalysisProviderError, DiagramProviderError):
+    except LlmProviderError:
         logger.warning(
             "session_processing_retry_scheduled",
             session_id=session_id,

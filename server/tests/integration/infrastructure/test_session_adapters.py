@@ -14,7 +14,7 @@ from app.infrastructure.repositories.redis_session_repository import RedisSessio
 from app.infrastructure.events.redis_session_events import RedisSessionEventBroker
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.models import DiagramSession
-from app.modules.sessions.schemas import SessionStatusUpdate
+from app.modules.sessions.schemas import ClarificationHistoryEntry, SessionStatusUpdate
 
 _REDIS_URL = os.getenv("TEST_REDIS_URL", "redis://localhost:6379/15")
 
@@ -37,7 +37,15 @@ def test_redis_session_repository_persists_and_deletes_a_session() -> None:
             token_hash="token-hash",
             description="A booking system",
             language="en",
+            clarifications_enabled=True,
             status=SessionStatus.ANALYZING,
+            clarification_history=[
+                ClarificationHistoryEntry(
+                    round=1,
+                    question="How is booking confirmed?",
+                    answer="By email",
+                )
+            ],
             created_at=now,
             updated_at=now,
             expires_at=now + timedelta(hours=24),

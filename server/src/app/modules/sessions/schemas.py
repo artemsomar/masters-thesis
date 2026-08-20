@@ -24,6 +24,12 @@ class Answer(SessionSchema):
     value: str = Field(min_length=1)
 
 
+class ClarificationHistoryEntry(SessionSchema):
+    round: int = Field(ge=1)
+    question: str = Field(min_length=1)
+    answer: str = Field(min_length=1)
+
+
 class SessionStatusUpdate(SessionSchema):
     status: SessionStatus
     error_code: str | None = Field(default=None, serialization_alias="errorCode")

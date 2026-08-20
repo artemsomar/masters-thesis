@@ -1,25 +1,28 @@
 import asyncio
+from typing import TypeVar, cast
 
 import pytest
+from pydantic import BaseModel
 
-from app.modules.analysis.schemas import AnalysisResult
-from app.modules.analysis.service import RequirementsAnalysisService
+from app.modules.clarifications.schemas import ClarificationResult
+from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.enums import ActorType, RelationType
 from app.modules.diagrams.schemas import (
     Actor,
     AssociationRelation,
     Diagram,
-    DiagramGenerationRequest,
     DiagramSystem,
     UseCase,
 )
+
+ResponseModel = TypeVar("ResponseModel", bound=BaseModel)
 from app.modules.diagrams.service import DiagramService
 from app.modules.sessions.errors import SessionNotFound
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.service import SessionService
 from app.workflows.diagram_session_workflow import DiagramSessionWorkflow
+from tests.fakes.fake_llm import FakeStructuredLlmClient
 from tests.fakes.fake_sessions import (
-    FakeRequirementsAnalyzer,
     FakeSessionCreationLimiter,
     FakeSessionEventBroker,
     FakeSessionJobDispatcher,
@@ -46,9 +49,9 @@ def test_cancelled_session_cannot_store_a_generated_diagram() -> None:
         workflow = DiagramSessionWorkflow(
             session_service,
             FakeSessionJobDispatcher(),
-            RequirementsAnalysisService(FakeRequirementsAnalyzer(AnalysisResult()), 7),
-            DiagramService(CancellingDiagramGenerator(session_service, session.id)),
-            max_analysis_rounds=3,
+            ClarificationService(FakeStructuredLlmClient(ClarificationResult()), 7),
+            DiagramService(CancellingStructuredLlmClient(session_service, session.id)),
+            max_clarification_rounds=3,
         )
 
         with pytest.raises(SessionNotFound):
@@ -63,25 +66,28 @@ def test_cancelled_session_cannot_store_a_generated_diagram() -> None:
     asyncio.run(scenario())
 
 
-class CancellingDiagramGenerator:
+class CancellingStructuredLlmClient:
     def __init__(self, session_service: SessionService, session_id: str) -> None:
         self._session_service = session_service
         self._session_id = session_id
 
-    async def generate(self, _: DiagramGenerationRequest) -> Diagram:
+    async def generate(self, _: str, __: type[ResponseModel], ___: str) -> ResponseModel:
         await self._session_service.delete(self._session_id)
-        return Diagram(
-            schema_version="1.0",
-            system=DiagramSystem(id="booking-system", name="Booking system"),
-            actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
-            use_cases=[UseCase(id="book-service", name="Book service")],
-            relations=[
-                AssociationRelation(
-                    type=RelationType.ASSOCIATION,
-                    source_id="client",
-                    target_id="book-service",
-                )
-            ],
-            assumptions=[],
-            warnings=[],
+        return cast(
+            ResponseModel,
+            Diagram(
+                schema_version="1.0",
+                system=DiagramSystem(id="booking-system", name="Booking system"),
+                actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
+                use_cases=[UseCase(id="book-service", name="Book service")],
+                relations=[
+                    AssociationRelation(
+                        type=RelationType.ASSOCIATION,
+                        source_id="client",
+                        target_id="book-service",
+                    )
+                ],
+                assumptions=[],
+                warnings=[],
+            ),
         )

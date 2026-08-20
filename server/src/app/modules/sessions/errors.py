@@ -28,6 +28,13 @@ class InvalidQuestionRound(AppError):
         super().__init__("invalid_question_round", "The question round is no longer current")
 
 
+class InvalidAnswers(AppError):
+    def __init__(self) -> None:
+        super().__init__(
+            "invalid_answers", "The submitted answers do not match the current questions"
+        )
+
+
 class SessionCreationRateLimitExceeded(AppError):
     def __init__(self) -> None:
         super().__init__(

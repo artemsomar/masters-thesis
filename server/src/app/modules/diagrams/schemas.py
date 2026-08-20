@@ -14,21 +14,10 @@ class DiagramSchema(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
-class DiagramGenerationAnswer(DiagramSchema):
-    question_id: str = Field(
-        min_length=1,
-        max_length=100,
-        validation_alias=AliasChoices("question_id", "questionId"),
-        serialization_alias="questionId",
-    )
-    value: str = Field(min_length=1)
-
-
 class DiagramGenerationRequest(DiagramSchema):
     description: str = Field(min_length=1)
     language: str = Field(min_length=2, max_length=10)
-    facts: list[str] = Field(max_length=100)
-    answers: list[DiagramGenerationAnswer]
+    clarification_context: str = Field(min_length=1)
 
 
 class DiagramSystem(DiagramSchema):

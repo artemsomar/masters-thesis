@@ -17,7 +17,7 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("GEMINI_API_KEY", "APP_GEMINI_API_KEY"),
     )
     gemini_model: str = ""
-    max_analysis_rounds: Annotated[int, Field(ge=1)] = 3
+    max_clarification_rounds: Annotated[int, Field(ge=1)] = 3
     max_questions_per_round: Annotated[int, Field(ge=1)] = 7
     max_description_length: Annotated[int, Field(ge=1)] = 20_000
     max_answer_length: Annotated[int, Field(ge=1)] = 2_000

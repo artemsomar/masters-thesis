@@ -31,7 +31,10 @@ async def create_session(
 ) -> CreateDiagramSessionResponse:
     client_address = http_request.client.host if http_request.client is not None else "unknown"
     session, token = await container.diagram_session_workflow.create_session(
-        request.description, request.language, client_address
+        request.description,
+        request.language,
+        client_address,
+        request.clarifications_enabled,
     )
     return CreateDiagramSessionResponse(
         session_id=session.id,
