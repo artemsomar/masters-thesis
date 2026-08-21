@@ -5,7 +5,7 @@ import pytest
 from app.modules.clarifications.schemas import ClarificationQuestion, ClarificationResult
 from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.enums import ActorType, RelationType
-from app.modules.diagrams.schemas import Actor, AssociationRelation, Diagram, DiagramSystem, UseCase
+from app.modules.diagrams.schemas import Actor, Diagram, DiagramRelation, DiagramSystem, UseCase
 from app.modules.diagrams.service import DiagramService
 from app.modules.sessions.enums import SessionStatus
 from app.modules.sessions.service import SessionService
@@ -57,7 +57,7 @@ def test_invalid_clarification_result_marks_the_session_as_failed() -> None:
                         actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
                         use_cases=[UseCase(id="book-service", name="Book service")],
                         relations=[
-                            AssociationRelation(
+                            DiagramRelation(
                                 type=RelationType.ASSOCIATION,
                                 source_id="client",
                                 target_id="book-service",

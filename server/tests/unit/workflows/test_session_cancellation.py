@@ -9,8 +9,8 @@ from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.enums import ActorType, RelationType
 from app.modules.diagrams.schemas import (
     Actor,
-    AssociationRelation,
     Diagram,
+    DiagramRelation,
     DiagramSystem,
     UseCase,
 )
@@ -81,7 +81,7 @@ class CancellingStructuredLlmClient:
                 actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
                 use_cases=[UseCase(id="book-service", name="Book service")],
                 relations=[
-                    AssociationRelation(
+                    DiagramRelation(
                         type=RelationType.ASSOCIATION,
                         source_id="client",
                         target_id="book-service",

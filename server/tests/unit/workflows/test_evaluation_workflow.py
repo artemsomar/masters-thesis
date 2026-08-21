@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from app.modules.diagrams.enums import ActorType, RelationType
-from app.modules.diagrams.schemas import Actor, AssociationRelation, Diagram, DiagramSystem, UseCase
+from app.modules.diagrams.schemas import Actor, Diagram, DiagramRelation, DiagramSystem, UseCase
 from app.modules.diagrams.service import DiagramService
 from app.modules.evaluation.dataset_reader import EvaluationDatasetReader
 from app.modules.evaluation.service import EvaluationService
@@ -59,7 +59,7 @@ def _diagram() -> Diagram:
         actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
         use_cases=[UseCase(id="book-service", name="Book service")],
         relations=[
-            AssociationRelation(
+            DiagramRelation(
                 type=RelationType.ASSOCIATION,
                 source_id="client",
                 target_id="book-service",

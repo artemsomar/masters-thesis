@@ -56,104 +56,50 @@ class UseCase(DiagramSchema):
     )
 
 
-class AssociationRelation(DiagramSchema):
-    type: Literal[RelationType.ASSOCIATION] = Field(
-        description="A direct interaction between an actor and a use case.",
+class DiagramRelation(DiagramSchema):
+    type: RelationType = Field(
+        description="The UML relationship type: association, include, extend, or generalization.",
     )
     source_id: DiagramIdentifier = Field(
         validation_alias=AliasChoices("source_id", "sourceId"),
         serialization_alias="sourceId",
-        description="The identifier of the actor that interacts with the use case.",
+        description="The identifier at the source of the relationship.",
     )
     target_id: DiagramIdentifier = Field(
         validation_alias=AliasChoices("target_id", "targetId"),
         serialization_alias="targetId",
-        description="The identifier of the use case the actor interacts with.",
+        description="The identifier at the target of the relationship.",
     )
 
 
-class IncludeRelation(DiagramSchema):
-    type: Literal[RelationType.INCLUDE] = Field(
-        description="A mandatory reusable behavior included by another use case.",
-    )
-    source_id: DiagramIdentifier = Field(
-        validation_alias=AliasChoices("source_id", "sourceId"),
-        serialization_alias="sourceId",
-        description="The identifier of the base use case that includes common behavior.",
-    )
-    target_id: DiagramIdentifier = Field(
-        validation_alias=AliasChoices("target_id", "targetId"),
-        serialization_alias="targetId",
-        description="The identifier of the mandatory reusable use case included by sourceId.",
-    )
-
-
-class ExtendRelation(DiagramSchema):
-    type: Literal[RelationType.EXTEND] = Field(
-        description="An optional or conditional behavior that extends a base use case.",
-    )
-    source_id: DiagramIdentifier = Field(
-        validation_alias=AliasChoices("source_id", "sourceId"),
-        serialization_alias="sourceId",
-        description="The identifier of the extending use case.",
-    )
-    target_id: DiagramIdentifier = Field(
-        validation_alias=AliasChoices("target_id", "targetId"),
-        serialization_alias="targetId",
-        description="The identifier of the base use case extended by sourceId.",
-    )
-
-
-class GeneralizationRelation(DiagramSchema):
-    type: Literal[RelationType.GENERALIZATION] = Field(
-        description="A specialization relationship between two actors or between two use cases.",
-    )
-    source_id: DiagramIdentifier = Field(
-        validation_alias=AliasChoices("source_id", "sourceId"),
-        serialization_alias="sourceId",
-        description="The identifier of the specialized actor or use case.",
-    )
-    target_id: DiagramIdentifier = Field(
-        validation_alias=AliasChoices("target_id", "targetId"),
-        serialization_alias="targetId",
-        description="The identifier of the more general actor or use case.",
-    )
-
-
-DiagramRelation = Annotated[
-    AssociationRelation | IncludeRelation | ExtendRelation | GeneralizationRelation,
-    Field(discriminator="type"),
-]
-
-
-class Diagram(DiagramSchema):
-    schema_version: Literal["1.0"] = Field(
-        validation_alias=AliasChoices("schema_version", "schemaVersion"),
-        serialization_alias="schemaVersion",
-        description="The fixed compatibility version of this diagram JSON contract.",
-    )
+class DiagramContent(DiagramSchema):
     system: DiagramSystem = Field(description="The boundary of the described system.")
     actors: list[Actor] = Field(
-        min_length=1,
-        max_length=100,
         description="External roles or systems that interact directly with the system boundary.",
     )
     use_cases: list[UseCase] = Field(
-        min_length=1,
-        max_length=100,
         validation_alias=AliasChoices("use_cases", "useCases"),
         serialization_alias="useCases",
         description="Goal-oriented system capabilities available to actors.",
     )
     relations: list[DiagramRelation] = Field(
-        max_length=300,
         description="Semantic UML relationships that reference existing actor or use case identifiers.",
     )
     assumptions: list[str] = Field(
-        max_length=100,
         description="Only material assumptions made because the available requirements were ambiguous.",
     )
     warnings: list[str] = Field(
-        max_length=100,
         description="Only material limitations or unresolved ambiguities that may affect the diagram.",
+    )
+
+
+class DiagramGenerationOutput(DiagramContent):
+    pass
+
+
+class Diagram(DiagramContent):
+    schema_version: Literal["1.0"] = Field(
+        validation_alias=AliasChoices("schema_version", "schemaVersion"),
+        serialization_alias="schemaVersion",
+        description="The fixed compatibility version of this diagram JSON contract.",
     )

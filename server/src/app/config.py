@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     )
     gemini_model: str = ""
     gemini_embedding_model: str = ""
+    gemini_embedding_dimensions: Annotated[int, Field(ge=1)] = 768
     max_clarification_rounds: Annotated[int, Field(ge=1)] = 3
     max_questions_per_round: Annotated[int, Field(ge=1)] = 7
     max_description_length: Annotated[int, Field(ge=1)] = 20_000

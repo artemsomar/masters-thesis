@@ -105,7 +105,9 @@ def build_evaluation_container(
         resolved_settings.gemini_api_key, resolved_settings.gemini_model
     )
     embedding_client = GeminiEmbeddingClient(
-        resolved_settings.gemini_api_key, resolved_settings.gemini_embedding_model
+        resolved_settings.gemini_api_key,
+        resolved_settings.gemini_embedding_model,
+        resolved_settings.gemini_embedding_dimensions,
     )
     evaluation_service = EvaluationService(
         EvaluationDatasetReader(),
