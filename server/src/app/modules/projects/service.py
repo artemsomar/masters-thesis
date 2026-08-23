@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from app.modules.projects.errors import InvalidProjectToken, ProjectNotFound
-from app.modules.projects.models import Project
+from app.modules.projects.models import CreatedProject, Project, ProjectAccessCredentials
 from app.modules.projects.repository import ProjectRepository
 from app.modules.sessions.tokens import create_token, hash_token
 
@@ -17,7 +17,7 @@ class ProjectService:
         self._ttl = timedelta(seconds=ttl_seconds)
         self._ttl_seconds = ttl_seconds
 
-    async def create(self, name: str) -> tuple[Project, str]:
+    async def create(self, name: str) -> CreatedProject:
         token = create_token()
         now = datetime.now(UTC)
         project = Project(
@@ -30,7 +30,7 @@ class ProjectService:
             expires_at=now + self._ttl,
         )
         await self._repository.save_new(project, self._ttl_seconds)
-        return project, token
+        return CreatedProject(project=project, project_token=token)
 
     async def get_authorized(self, project_id: str, token: str) -> Project:
         project = await self.get(project_id)
@@ -51,6 +51,19 @@ class ProjectService:
         if project is None:
             raise ProjectNotFound()
         return project
+
+    async def get_available(
+        self, project_access: list[ProjectAccessCredentials]
+    ) -> list[Project]:
+        available: list[Project] = []
+        for access in project_access:
+            try:
+                available.append(
+                    await self.get_authorized(access.project_id, access.project_token)
+                )
+            except (ProjectNotFound, InvalidProjectToken):
+                continue
+        return available
 
     async def delete(self, project_id: str) -> None:
         await self.get(project_id)

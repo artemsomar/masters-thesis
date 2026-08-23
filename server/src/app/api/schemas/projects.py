@@ -27,3 +27,12 @@ class ProjectResponse(ProjectMetadataResponse):
 
 class UpdateProjectRequest(ApiSchema):
     document_xml: str = Field(min_length=1, max_length=2_000_000, validation_alias="documentXml")
+
+
+class AvailableProjectAccess(ApiSchema):
+    project_id: str = Field(validation_alias="projectId")
+    project_token: str = Field(validation_alias="projectToken")
+
+
+class AvailableProjectsRequest(ApiSchema):
+    projects: list[AvailableProjectAccess] = Field(max_length=100)

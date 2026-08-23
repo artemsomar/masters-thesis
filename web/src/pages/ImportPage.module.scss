@@ -1,0 +1,85 @@
+.page {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+.main {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 32px;
+}
+.card {
+  display: grid;
+  width: min(100%, 520px);
+  gap: 16px;
+  padding: 32px;
+  border: 1px solid #d9dde3;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+.card > svg {
+  color: #4b41e1;
+}
+.card h1,
+.card p {
+  margin: 0;
+}
+.card h1 {
+  color: #1e293b;
+  font-size: 25px;
+}
+.card p {
+  color: #64748b;
+  line-height: 1.5;
+}
+.kicker {
+  color: #4b41e1 !important;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.fileInput {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px dashed #94a3b8;
+  border-radius: 7px;
+  color: #475569;
+  cursor: pointer;
+}
+.fileInput input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.card button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 43px;
+  border: 0;
+  border-radius: 7px;
+  background: #4b41e1;
+  color: #fff;
+  font-weight: 700;
+}
+.card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.error {
+  color: #b91c1c !important;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

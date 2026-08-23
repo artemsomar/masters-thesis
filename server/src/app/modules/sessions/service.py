@@ -11,7 +11,7 @@ from app.modules.sessions.errors import (
     SessionNotFound,
 )
 from app.modules.sessions.enums import SessionStatus
-from app.modules.sessions.models import DiagramSession
+from app.modules.sessions.models import CreatedDiagramSession, DiagramSession, SessionQuestions
 from app.modules.sessions.ports import SessionCreationLimiter, SessionEventPublisher
 from app.modules.sessions.repository import SessionRepository
 from app.modules.sessions.input_validation import validate_answers, validate_description
@@ -46,7 +46,7 @@ class SessionService:
         language: str,
         client_address: str,
         clarifications_enabled: bool = True,
-    ) -> tuple[DiagramSession, str]:
+    ) -> CreatedDiagramSession:
         validate_description(description, self._max_description_length)
         token = create_token()
         now = datetime.now(UTC)
@@ -69,7 +69,7 @@ class SessionService:
         except Exception:
             await self._creation_limiter.release(session.id)
             raise
-        return session, token
+        return CreatedDiagramSession(session=session, session_token=token)
 
     async def get_authorized(self, session_id: str, token: str) -> DiagramSession:
         session = await self._get(session_id)
@@ -120,11 +120,11 @@ class SessionService:
             await self._publish_status(session)
         return session
 
-    async def get_questions(self, session_id: str) -> tuple[int, list[Question]]:
+    async def get_questions(self, session_id: str) -> SessionQuestions:
         session = await self._get(session_id)
         if session.status is not SessionStatus.AWAITING_ANSWERS:
             raise QuestionsNotAvailable()
-        return session.question_round, session.questions
+        return SessionQuestions(round=session.question_round, questions=session.questions)
 
     async def submit_answers(
         self, session_id: str, question_round: int, answers: list[Answer]

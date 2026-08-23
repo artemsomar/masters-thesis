@@ -1,0 +1,36 @@
+.controls {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
+}
+.controls button,
+.controls a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.controls button:hover:not(:disabled),
+.controls a:hover {
+  background: #eef0ff;
+  color: #4b41e1;
+}
+.controls button:disabled {
+  cursor: not-allowed;
+  color: #cbd5e1;
+}

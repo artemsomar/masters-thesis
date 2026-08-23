@@ -9,9 +9,10 @@ import { GridLayer } from './layers/GridLayer';
 import { InteractionLayer } from './layers/InteractionLayer';
 import styles from './DiagramCanvas.module.scss';
 
-export const DiagramCanvas = () => {
+type Props = { stageRef: React.RefObject<Konva.Stage | null> };
+
+export const DiagramCanvas = ({ stageRef }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<Konva.Stage>(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const nodes = useDiagramStore((state) => state.document.nodes);
   const relations = useDiagramStore((state) => state.document.relations);

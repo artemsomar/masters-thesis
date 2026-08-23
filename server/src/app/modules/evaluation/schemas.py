@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
-
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
+from app.modules.diagrams.schemas import Diagram
 from app.modules.evaluation.enums import EvaluationRelationType
 
 
@@ -106,7 +105,7 @@ class DiagramEvaluationResult(EvaluationSchema):
         serialization_alias="caseId",
         description="Identifier of the evaluated dataset case.",
     )
-    generated_diagram: dict[str, Any] | None = Field(
+    generated_diagram: Diagram | None = Field(
         validation_alias=AliasChoices("generated_diagram", "generatedDiagram"),
         serialization_alias="generatedDiagram",
         description="Generated diagram, absent when it is not UML-valid.",

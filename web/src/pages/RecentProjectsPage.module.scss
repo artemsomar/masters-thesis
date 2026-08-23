@@ -1,0 +1,74 @@
+.page {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+.main {
+  flex: 1;
+  padding: 40px;
+}
+.main header p {
+  margin: 0 0 4px;
+  color: #4b41e1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.main h1 {
+  margin: 0 0 28px;
+  color: #1e293b;
+}
+.list {
+  display: grid;
+  max-width: 760px;
+  gap: 10px;
+}
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #d9dde3;
+  border-radius: 9px;
+  background: #fff;
+}
+.card > svg {
+  color: #4b41e1;
+}
+.card h2 {
+  margin: 0 0 5px;
+  font-size: 15px;
+}
+.card span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #64748b;
+  font-size: 12px;
+}
+.card a {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: #eef0ff;
+  color: #4b41e1;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.empty {
+  color: #64748b;
+}
+.error {
+  margin-top: 18px;
+  color: #b91c1c;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

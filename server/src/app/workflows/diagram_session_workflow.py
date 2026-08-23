@@ -11,7 +11,7 @@ from app.modules.diagrams.prompts import PROMPT_VERSION as DIAGRAM_PROMPT_VERSIO
 from app.modules.diagrams.schemas import Diagram, DiagramGenerationRequest
 from app.modules.diagrams.service import DiagramService
 from app.modules.sessions.enums import SessionStatus
-from app.modules.sessions.models import DiagramSession
+from app.modules.sessions.models import CreatedDiagramSession, DiagramSession
 from app.modules.sessions.ports import SessionJobDispatcher
 from app.modules.sessions.schemas import Answer, Question
 from app.modules.sessions.service import SessionService
@@ -41,10 +41,11 @@ class DiagramSessionWorkflow:
         language: str,
         client_address: str,
         clarifications_enabled: bool,
-    ) -> tuple[DiagramSession, str]:
-        session, token = await self._session_service.create(
+    ) -> CreatedDiagramSession:
+        created_session = await self._session_service.create(
             description, language, client_address, clarifications_enabled
         )
+        session = created_session.session
         target = (
             SessionStatus.ANALYZING
             if session.clarifications_enabled
@@ -58,7 +59,7 @@ class DiagramSessionWorkflow:
         except Exception:
             await self._session_service.fail(session.id, "session_processing_failed")
             raise
-        return session, token
+        return CreatedDiagramSession(session=session, session_token=created_session.session_token)
 
     async def delete_session(self, session_id: str) -> None:
         session = await self._session_service.get(session_id)

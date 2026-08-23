@@ -30,15 +30,16 @@ async def create_session(
     container: ApplicationContainer = Depends(get_container),
 ) -> CreateDiagramSessionResponse:
     client_address = http_request.client.host if http_request.client is not None else "unknown"
-    session, token = await container.diagram_session_workflow.create_session(
+    created_session = await container.diagram_session_workflow.create_session(
         request.description,
         request.language,
         client_address,
         request.clarifications_enabled,
     )
+    session = created_session.session
     return CreateDiagramSessionResponse(
         session_id=session.id,
-        session_token=token,
+        session_token=created_session.session_token,
         status=session.status,
         expires_at=session.expires_at,
     )
@@ -75,8 +76,8 @@ async def get_questions(
     session: DiagramSession = Depends(get_authorized_session),
     container: ApplicationContainer = Depends(get_container),
 ) -> QuestionsResponse:
-    question_round, questions = await container.session_service.get_questions(session.id)
-    return QuestionsResponse(round=question_round, questions=questions)
+    session_questions = await container.session_service.get_questions(session.id)
+    return QuestionsResponse(round=session_questions.round, questions=session_questions.questions)
 
 
 @router.post(

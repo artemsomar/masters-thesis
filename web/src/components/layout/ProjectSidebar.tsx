@@ -1,4 +1,4 @@
-import { FilePlus2, PencilLine } from 'lucide-react';
+import { Clock3, FilePlus2, PencilLine } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import styles from './ProjectSidebar.module.scss';
 
@@ -32,6 +32,13 @@ export const ProjectSidebar = ({ projectName = 'New project', projectId }: Props
           Editor
         </span>
       )}
+      <NavLink
+        to="/projects"
+        className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+      >
+        <Clock3 size={17} />
+        Recent Projects
+      </NavLink>
     </nav>
   </aside>
 );

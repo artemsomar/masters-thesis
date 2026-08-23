@@ -12,7 +12,7 @@ export const InteractionLayer = ({ selectedNodes, nodes, interaction }: Props) =
       ? nodes.find((node) => node.id === interaction.sourceId)
       : undefined;
   return (
-    <Layer listening={false}>
+    <Layer name="interaction-layer" listening={false}>
       {selectedNodes.map((node) => (
         <SelectionTransformer key={node.id} node={node} />
       ))}

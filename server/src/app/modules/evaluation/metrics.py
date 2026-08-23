@@ -3,6 +3,9 @@ from collections import Counter
 from app.modules.evaluation.enums import EvaluationRelationType
 from app.modules.evaluation.schemas import F1Score, EvaluationRelation, RelationshipScores
 
+RelationKey = tuple[EvaluationRelationType, str, str]
+NodeIdMapping = dict[str, str]
+
 
 def build_f1_score(true_positives: int, reference_total: int, generated_total: int) -> F1Score:
     precision = _ratio(true_positives, generated_total)
@@ -17,7 +20,7 @@ def build_f1_score(true_positives: int, reference_total: int, generated_total: i
 def score_relations(
     reference: list[EvaluationRelation],
     generated: list[EvaluationRelation],
-    node_mapping: dict[str, str],
+    node_mapping: NodeIdMapping,
 ) -> RelationshipScores:
     return RelationshipScores(
         overall=_score_relation_group(reference, generated, node_mapping),
@@ -39,7 +42,7 @@ def score_relations(
 def _score_relation_group(
     reference: list[EvaluationRelation],
     generated: list[EvaluationRelation],
-    node_mapping: dict[str, str],
+    node_mapping: NodeIdMapping,
     relation_type: EvaluationRelationType | None = None,
 ) -> F1Score:
     reference_group = _filter_relations(reference, relation_type)
@@ -63,8 +66,8 @@ def _filter_relations(
 
 
 def _map_relation(
-    relation: EvaluationRelation, node_mapping: dict[str, str]
-) -> tuple[EvaluationRelationType, str, str] | None:
+    relation: EvaluationRelation, node_mapping: NodeIdMapping
+) -> RelationKey | None:
     source_id = node_mapping.get(relation.source_id)
     target_id = node_mapping.get(relation.target_id)
     if source_id is None or target_id is None:
@@ -72,7 +75,7 @@ def _map_relation(
     return relation.type, source_id, target_id
 
 
-def _relation_key(relation: EvaluationRelation) -> tuple[EvaluationRelationType, str, str]:
+def _relation_key(relation: EvaluationRelation) -> RelationKey:
     return relation.type, relation.source_id, relation.target_id
 
 

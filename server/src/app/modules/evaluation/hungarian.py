@@ -1,4 +1,9 @@
-def maximum_weight_assignment(weights: list[list[float]]) -> list[tuple[int, int]]:
+Assignment = tuple[int, int]
+Assignments = list[Assignment]
+WeightMatrix = list[list[float]]
+
+
+def maximum_weight_assignment(weights: WeightMatrix) -> Assignments:
     if not weights or not weights[0]:
         return []
     if len(weights) <= len(weights[0]):
@@ -12,7 +17,7 @@ def maximum_weight_assignment(weights: list[list[float]]) -> list[tuple[int, int
     ]
 
 
-def _minimum_cost_assignment(costs: list[list[float]]) -> list[tuple[int, int]]:
+def _minimum_cost_assignment(costs: WeightMatrix) -> Assignments:
     row_count = len(costs)
     column_count = len(costs[0])
     potentials_by_row = [0.0] * (row_count + 1)

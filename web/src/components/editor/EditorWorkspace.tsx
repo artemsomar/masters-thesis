@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import type Konva from 'konva';
 import { useProjectAutosave } from '../../hooks/useProjectAutosave';
 import { useProjectDocument } from '../../hooks/useProjectDocument';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
@@ -8,6 +10,7 @@ import { EditorHeader } from './EditorHeader';
 import { PropertiesPanel } from './properties/PropertiesPanel';
 import { CanvasControls } from './toolbar/CanvasControls';
 import { EditorToolPalette } from './toolbar/EditorToolPalette';
+import { EditorExportControls } from './toolbar/EditorExportControls';
 import { HistoryControls } from './toolbar/HistoryControls';
 import { QuickAddControls } from './toolbar/QuickAddControls';
 import styles from './EditorWorkspace.module.scss';
@@ -15,6 +18,7 @@ import styles from './EditorWorkspace.module.scss';
 type Props = { projectId: string; projectToken: string; documentXml: string; projectName: string };
 
 export const EditorWorkspace = ({ projectId, projectToken, documentXml, projectName }: Props) => {
+  const stageRef = useRef<Konva.Stage>(null);
   useProjectDocument(documentXml);
   useKeyboardShortcuts();
   const document = useDiagramStore((state) => state.document);
@@ -33,7 +37,8 @@ export const EditorWorkspace = ({ projectId, projectToken, documentXml, projectN
           <EditorToolPalette />
           <QuickAddControls />
           <HistoryControls />
-          <DiagramCanvas />
+          <EditorExportControls document={document} stageRef={stageRef} />
+          <DiagramCanvas stageRef={stageRef} />
           <CanvasControls />
         </div>
         <PropertiesPanel element={selectedElement} />

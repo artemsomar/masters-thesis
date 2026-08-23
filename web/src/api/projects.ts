@@ -1,5 +1,5 @@
 import { request } from './client';
-import type { Project, ProjectAccess } from '../types/project';
+import type { AvailableProjectRequest, Project, ProjectAccess } from '../types/project';
 
 type CreateProjectResponse = ProjectAccess & { documentXml: string };
 
@@ -20,4 +20,12 @@ export const updateProject = (
     method: 'PUT',
     headers: { Authorization: `Bearer ${projectToken}` },
     body: JSON.stringify({ documentXml }),
+  });
+
+export const getAvailableProjects = (
+  projects: AvailableProjectRequest[],
+): Promise<Omit<ProjectAccess, 'projectToken'>[]> =>
+  request('/api/v1/projects/available', {
+    method: 'POST',
+    body: JSON.stringify({ projects }),
   });

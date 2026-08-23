@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 
 from app.modules.evaluation.dataset_reader import EvaluationDatasetReader
@@ -7,6 +8,13 @@ from app.modules.evaluation.matching import NodeMatching, match_nodes
 from app.modules.evaluation.metrics import score_relations
 from app.modules.evaluation.ports import EmbeddingClient
 from app.modules.evaluation.schemas import ComparableDiagram, EvaluationCase, RelationshipScores
+
+
+@dataclass(frozen=True, slots=True)
+class EvaluationComparison:
+    actor_matching: NodeMatching
+    use_case_matching: NodeMatching
+    relationship_scores: RelationshipScores
 
 
 class EvaluationService:
@@ -35,7 +43,7 @@ class EvaluationService:
 
     async def compare(
         self, reference: ComparableDiagram, generated: ComparableDiagram
-    ) -> tuple[NodeMatching, NodeMatching, RelationshipScores]:
+    ) -> EvaluationComparison:
         actor_matching = await match_nodes(
             reference.actors,
             generated.actors,
@@ -48,10 +56,10 @@ class EvaluationService:
             self._use_case_similarity_threshold,
             self._embedding_client,
         )
-        return (
-            actor_matching,
-            use_case_matching,
-            score_relations(
+        return EvaluationComparison(
+            actor_matching=actor_matching,
+            use_case_matching=use_case_matching,
+            relationship_scores=score_relations(
                 reference.relations,
                 generated.relations,
                 actor_matching.mapping | use_case_matching.mapping,

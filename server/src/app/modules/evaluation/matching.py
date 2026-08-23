@@ -4,15 +4,18 @@ import faiss
 import numpy as np
 
 from app.modules.evaluation.errors import InvalidEmbeddingResult
+from app.modules.evaluation.embedding_types import EmbeddingMatrix, EmbeddingVector
 from app.modules.evaluation.hungarian import maximum_weight_assignment
 from app.modules.evaluation.metrics import build_f1_score
 from app.modules.evaluation.ports import EmbeddingClient
 from app.modules.evaluation.schemas import EvaluationNode, F1Score
 
+NodeIdMapping = dict[str, str]
+
 
 @dataclass(frozen=True, slots=True)
 class NodeMatching:
-    mapping: dict[str, str]
+    mapping: NodeIdMapping
     score: F1Score
 
 
@@ -42,8 +45,8 @@ async def match_nodes(
 
 
 def _similarity_matrix(
-    reference_vectors: list[list[float]], generated_vectors: list[list[float]]
-) -> list[list[float]]:
+    reference_vectors: EmbeddingMatrix, generated_vectors: EmbeddingMatrix
+) -> EmbeddingMatrix:
     reference_matrix = np.asarray(reference_vectors, dtype=np.float32)
     generated_matrix = np.asarray(generated_vectors, dtype=np.float32)
     if (

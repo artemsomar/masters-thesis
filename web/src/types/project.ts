@@ -9,3 +9,5 @@ export type ProjectAccess = {
 export type Project = Omit<ProjectAccess, 'projectToken'> & {
   documentXml: string;
 };
+
+export type AvailableProjectRequest = Pick<ProjectAccess, 'projectId' | 'projectToken'>;

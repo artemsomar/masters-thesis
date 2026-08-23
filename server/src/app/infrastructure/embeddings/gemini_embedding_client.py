@@ -3,6 +3,7 @@ from google import genai
 from google.genai import types
 
 from app.modules.evaluation.errors import InvalidEmbeddingResult
+from app.modules.evaluation.embedding_types import EmbeddingMatrix
 
 logger = structlog.get_logger(__name__)
 
@@ -13,7 +14,7 @@ class GeminiEmbeddingClient:
         self._model = model
         self._dimensions = dimensions
 
-    async def embed(self, texts: list[str]) -> list[list[float]]:
+    async def embed(self, texts: list[str]) -> EmbeddingMatrix:
         if not texts:
             return []
         if not self._api_key or not self._model:

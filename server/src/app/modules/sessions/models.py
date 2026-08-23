@@ -24,3 +24,15 @@ class DiagramSession:
     diagram_json: str | None = None
     diagram_prompt_version: str | None = None
     error_code: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class CreatedDiagramSession:
+    session: DiagramSession
+    session_token: str
+
+
+@dataclass(frozen=True, slots=True)
+class SessionQuestions:
+    round: int
+    questions: list[Question]

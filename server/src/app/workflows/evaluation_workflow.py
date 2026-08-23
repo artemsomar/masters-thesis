@@ -38,19 +38,17 @@ class EvaluationWorkflow:
                 diagram_prompt_version=DIAGRAM_PROMPT_VERSION,
                 uml_validity_score=0,
             )
-        actor_matching, use_case_matching, relationship_scores = (
-            await self._evaluation_service.compare(
-                case.reference_diagram, _to_comparable_diagram(generated)
-            )
+        comparison = await self._evaluation_service.compare(
+            case.reference_diagram, _to_comparable_diagram(generated)
         )
         return DiagramEvaluationResult(
             case_id=case.case_id,
-            generated_diagram=generated.model_dump(by_alias=True),
+            generated_diagram=generated,
             diagram_prompt_version=DIAGRAM_PROMPT_VERSION,
             uml_validity_score=1,
-            actor_score=actor_matching.score,
-            use_case_score=use_case_matching.score,
-            relationship_scores=relationship_scores,
+            actor_score=comparison.actor_matching.score,
+            use_case_score=comparison.use_case_matching.score,
+            relationship_scores=comparison.relationship_scores,
         )
 
 
