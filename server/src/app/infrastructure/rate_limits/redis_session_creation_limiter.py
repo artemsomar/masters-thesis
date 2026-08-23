@@ -24,8 +24,8 @@ if daily_count == 0 then
     redis.call('EXPIRE', KEYS[1], ARGV[4])
 end
 redis.call('ZADD', KEYS[2], ARGV[5], ARGV[6])
-redis.call('EXPIRE', KEYS[2], ARGV[7])
-redis.call('SET', KEYS[3], ARGV[8], 'EX', ARGV[7])
+redis.call('EXPIRE', KEYS[2], ARGV[8])
+redis.call('SET', KEYS[3], ARGV[7], 'EX', ARGV[8])
 return 0
 """
     _RELEASE_SCRIPT = """

@@ -8,10 +8,10 @@ type XmlNode = {
   '@_id': string;
   '@_kind': DiagramNode['kind'];
   '@_name': string;
-  '@_x': number;
-  '@_y': number;
-  '@_width'?: number;
-  '@_height'?: number;
+  '@_x': string;
+  '@_y': string;
+  '@_width'?: string;
+  '@_height'?: string;
   '@_fill'?: string;
   '@_stroke'?: string;
   '@_textColor'?: string;
@@ -71,7 +71,7 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
   const syntax = XMLValidator.validate(xml);
   if (syntax !== true)
     throw new Error(`The XML file is not valid (line ${syntax.err.line}: ${syntax.err.msg}).`);
-  const parsed = new XMLParser({ ignoreAttributes: false, parseAttributeValue: true }).parse(
+  const parsed = new XMLParser({ ignoreAttributes: false, parseAttributeValue: false }).parse(
     xml,
   ) as {
     'diagram-document'?: {
