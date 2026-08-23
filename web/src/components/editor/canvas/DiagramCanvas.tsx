@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type Konva from 'konva';
 import { Stage } from 'react-konva';
+import { useCanvasInteraction } from '../../../hooks/useCanvasInteraction';
 import { useDiagramStore } from '../../../store/diagram-store';
 import { useEditorUiStore } from '../../../store/editor-ui-store';
 import { DiagramLayer } from './layers/DiagramLayer';
@@ -13,12 +14,12 @@ export const DiagramCanvas = () => {
   const stageRef = useRef<Konva.Stage>(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const nodes = useDiagramStore((state) => state.document.nodes);
-  const moveNode = useDiagramStore((state) => state.moveNode);
+  const relations = useDiagramStore((state) => state.document.relations);
   const selectedIds = useEditorUiStore((state) => state.selectedIds);
   const select = useEditorUiStore((state) => state.select);
-  const activeTool = useEditorUiStore((state) => state.activeTool);
   const viewport = useEditorUiStore((state) => state.viewport);
   const setViewport = useEditorUiStore((state) => state.setViewport);
+  const canvas = useCanvasInteraction();
 
   useEffect(() => {
     const element = containerRef.current;
@@ -40,17 +41,38 @@ export const DiagramCanvas = () => {
         y={viewport.y}
         scaleX={viewport.scale}
         scaleY={viewport.scale}
-        draggable={activeTool === 'pan'}
+        draggable={canvas.activeTool === 'pan'}
+        onDragStart={() => useEditorUiStore.getState().setInteraction({ mode: 'panning' })}
         onDragEnd={(event) => {
           setViewport({ x: event.target.x(), y: event.target.y(), scale: viewport.scale });
+          useEditorUiStore.getState().setInteraction({ mode: 'idle' });
         }}
         onMouseDown={(event) => {
-          if (event.target === event.target.getStage()) select('');
+          canvas.handleStageMouseDown(
+            event.target.getStage()!,
+            event.target === event.target.getStage(),
+          );
         }}
+        onMouseMove={(event) => canvas.handleStageMouseMove(event.target.getStage()!)}
+        onMouseUp={canvas.handleStageMouseUp}
       >
         <GridLayer width={size.width / viewport.scale} height={size.height / viewport.scale} />
-        <DiagramLayer nodes={nodes} onSelect={select} onDragEnd={moveNode} />
-        <InteractionLayer selectedNodes={nodes.filter((node) => selectedIds.includes(node.id))} />
+        <DiagramLayer
+          nodes={nodes}
+          relations={relations}
+          selectedIds={selectedIds}
+          onSelectNode={canvas.handleNodeSelect}
+          onSelectRelation={select}
+          onDragStart={canvas.handleDragStart}
+          onDragMove={canvas.handleDragMove}
+          onDragEnd={canvas.handleDragEnd}
+          draggable={canvas.activeTool === 'select'}
+        />
+        <InteractionLayer
+          selectedNodes={nodes.filter((node) => selectedIds.includes(node.id))}
+          nodes={nodes}
+          interaction={canvas.interaction}
+        />
       </Stage>
     </div>
   );

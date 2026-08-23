@@ -51,6 +51,6 @@ export type CanvasInteraction =
   | { mode: 'idle' }
   | { mode: 'panning' }
   | { mode: 'placing'; element: 'actor' | 'useCase' | 'boundary' }
-  | { mode: 'connecting'; relationType: RelationType; sourceId?: string }
-  | { mode: 'marquee'; start: Point }
+  | { mode: 'connecting'; relationType: RelationType; sourceId?: string; point?: Point }
+  | { mode: 'marquee'; start: Point; end: Point }
   | { mode: 'dragging'; elementIds: string[]; initialPositions: Record<string, Point> };

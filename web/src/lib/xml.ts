@@ -1,6 +1,6 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import { createEmptyDocument } from './diagram/factory';
-import type { DiagramDocument, DiagramNode, NodeStyle } from '../types/diagram';
+import type { DiagramDocument, DiagramNode, DiagramRelation, NodeStyle } from '../types/diagram';
 
 const defaultStyle: NodeStyle = { fill: '#ffffff', stroke: '#1e293b', textColor: '#1e293b' };
 
@@ -16,6 +16,13 @@ type XmlNode = {
   '@_stroke'?: string;
   '@_textColor'?: string;
   description?: string;
+};
+
+type XmlRelation = {
+  '@_id': string;
+  '@_type': DiagramRelation['type'];
+  '@_sourceId': string;
+  '@_targetId': string;
 };
 
 const asArray = <T>(value: T | T[] | undefined): T[] =>
@@ -58,7 +65,10 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
   const parsed = new XMLParser({ ignoreAttributes: false, parseAttributeValue: true }).parse(
     xml,
   ) as {
-    'diagram-document'?: { nodes?: { node?: XmlNode | XmlNode[] } };
+    'diagram-document'?: {
+      nodes?: { node?: XmlNode | XmlNode[] };
+      relations?: { relation?: XmlRelation | XmlRelation[] };
+    };
   };
   const root = parsed['diagram-document'];
   if (!root) throw new Error('The project document is not valid XML.');
@@ -89,6 +99,16 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
         style,
       };
     throw new Error('The project contains an unsupported diagram element.');
+  });
+  document.relations = asArray(root.relations?.relation).map((relation) => {
+    if (!['association', 'include', 'extend', 'generalization'].includes(relation['@_type']))
+      throw new Error('The project contains an unsupported relation type.');
+    return {
+      id: relation['@_id'],
+      type: relation['@_type'],
+      sourceId: relation['@_sourceId'],
+      targetId: relation['@_targetId'],
+    };
   });
   return document;
 };

@@ -4,13 +4,28 @@ import type { DiagramNodeCallbacks } from './node-props';
 
 type Props = DiagramNodeCallbacks & { node: ActorNodeModel };
 
-export const ActorNode = ({ node, onSelect, onDragEnd }: Props) => (
+export const ActorNode = ({
+  node,
+  onSelect,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
+  draggable,
+}: Props) => (
   <Group
     x={node.position.x}
     y={node.position.y}
-    draggable
-    onClick={onSelect}
-    onTap={onSelect}
+    draggable={draggable}
+    onClick={(event) => {
+      event.cancelBubble = true;
+      onSelect();
+    }}
+    onTap={(event) => {
+      event.cancelBubble = true;
+      onSelect();
+    }}
+    onDragStart={onDragStart}
+    onDragMove={(event) => onDragMove({ x: event.target.x(), y: event.target.y() })}
     onDragEnd={(event) => onDragEnd({ x: event.target.x(), y: event.target.y() })}
   >
     <Circle x={0} y={-26} radius={8} stroke={node.style.stroke} strokeWidth={1.8} />

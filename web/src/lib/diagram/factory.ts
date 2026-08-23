@@ -3,6 +3,8 @@ import type {
   BoundaryNode,
   DiagramDocument,
   DiagramNode,
+  DiagramRelation,
+  RelationType,
   UseCaseNode,
 } from '../../types/diagram';
 
@@ -41,4 +43,15 @@ export const createBoundary = (position: { x: number; y: number }): BoundaryNode
   position,
   size: { width: 440, height: 300 },
   style: baseStyle,
+});
+
+export const createRelation = (
+  type: RelationType,
+  sourceId: string,
+  targetId: string,
+): DiagramRelation => ({
+  id: `relation-${crypto.randomUUID()}`,
+  type,
+  sourceId,
+  targetId,
 });

@@ -1,5 +1,6 @@
 import { useProjectAutosave } from '../../hooks/useProjectAutosave';
 import { useProjectDocument } from '../../hooks/useProjectDocument';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useDiagramStore } from '../../store/diagram-store';
 import { useEditorUiStore } from '../../store/editor-ui-store';
 import { DiagramCanvas } from './canvas/DiagramCanvas';
@@ -7,6 +8,7 @@ import { EditorHeader } from './EditorHeader';
 import { PropertiesPanel } from './properties/PropertiesPanel';
 import { CanvasControls } from './toolbar/CanvasControls';
 import { EditorToolPalette } from './toolbar/EditorToolPalette';
+import { HistoryControls } from './toolbar/HistoryControls';
 import { QuickAddControls } from './toolbar/QuickAddControls';
 import styles from './EditorWorkspace.module.scss';
 
@@ -14,11 +16,14 @@ type Props = { projectId: string; projectToken: string; documentXml: string; pro
 
 export const EditorWorkspace = ({ projectId, projectToken, documentXml, projectName }: Props) => {
   useProjectDocument(documentXml);
+  useKeyboardShortcuts();
   const document = useDiagramStore((state) => state.document);
   const revision = useDiagramStore((state) => state.revision);
   const selectedIds = useEditorUiStore((state) => state.selectedIds);
   const saveState = useProjectAutosave(projectId, projectToken, document, revision);
-  const selectedNode = document.nodes.find((node) => node.id === selectedIds[0]);
+  const selectedElement =
+    document.nodes.find((node) => node.id === selectedIds[0]) ??
+    document.relations.find((relation) => relation.id === selectedIds[0]);
 
   return (
     <section className={styles.workspace}>
@@ -27,10 +32,11 @@ export const EditorWorkspace = ({ projectId, projectToken, documentXml, projectN
         <div className={styles.canvasArea}>
           <EditorToolPalette />
           <QuickAddControls />
+          <HistoryControls />
           <DiagramCanvas />
           <CanvasControls />
         </div>
-        <PropertiesPanel node={selectedNode} />
+        <PropertiesPanel element={selectedElement} />
       </div>
     </section>
   );

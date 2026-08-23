@@ -4,13 +4,28 @@ import type { DiagramNodeCallbacks } from './node-props';
 
 type Props = DiagramNodeCallbacks & { node: BoundaryNodeModel };
 
-export const SystemBoundaryNode = ({ node, onSelect, onDragEnd }: Props) => (
+export const SystemBoundaryNode = ({
+  node,
+  onSelect,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
+  draggable,
+}: Props) => (
   <Group
     x={node.position.x}
     y={node.position.y}
-    draggable
-    onClick={onSelect}
-    onTap={onSelect}
+    draggable={draggable}
+    onClick={(event) => {
+      event.cancelBubble = true;
+      onSelect();
+    }}
+    onTap={(event) => {
+      event.cancelBubble = true;
+      onSelect();
+    }}
+    onDragStart={onDragStart}
+    onDragMove={(event) => onDragMove({ x: event.target.x(), y: event.target.y() })}
     onDragEnd={(event) => onDragEnd({ x: event.target.x(), y: event.target.y() })}
   >
     <Rect
