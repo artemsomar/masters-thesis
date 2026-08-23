@@ -11,12 +11,13 @@ from app.modules.sessions.errors import (
     SessionCreationRateLimitExceeded,
     TooManyActiveSessions,
 )
+from app.modules.projects.errors import InvalidProjectToken, ProjectNotFound
 
 
 def status_code_for(error: AppError) -> int:
-    if isinstance(error, SessionNotFound):
+    if isinstance(error, (SessionNotFound, ProjectNotFound)):
         return 404
-    if isinstance(error, InvalidSessionToken):
+    if isinstance(error, (InvalidSessionToken, InvalidProjectToken)):
         return 401
     if isinstance(error, (InvalidSessionState, InvalidQuestionRound, QuestionsNotAvailable)):
         return 409

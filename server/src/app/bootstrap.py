@@ -12,6 +12,8 @@ from app.infrastructure.rate_limits.redis_session_creation_limiter import (
     RedisSessionCreationLimiter,
 )
 from app.infrastructure.repositories.redis_session_repository import RedisSessionRepository
+from app.infrastructure.repositories.redis_project_repository import RedisProjectRepository
+from app.modules.projects.service import ProjectService
 from app.logging_config import configure_logging
 from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.service import DiagramService
@@ -32,6 +34,7 @@ class ApplicationContainer:
     clarification_service: ClarificationService
     diagram_service: DiagramService
     diagram_session_workflow: DiagramSessionWorkflow
+    project_service: ProjectService
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,6 +79,11 @@ def build_container(settings: Settings | None = None) -> ApplicationContainer:
         llm_client, max_questions_per_round=resolved_settings.max_questions_per_round
     )
     diagram_service = DiagramService(llm_client)
+    project_service = ProjectService(
+        RedisProjectRepository(async_redis),
+        resolved_settings.session_token_pepper,
+        resolved_settings.session_ttl_seconds,
+    )
     return ApplicationContainer(
         settings=resolved_settings,
         async_redis=async_redis,
@@ -91,6 +99,7 @@ def build_container(settings: Settings | None = None) -> ApplicationContainer:
             diagram_service,
             resolved_settings.max_clarification_rounds,
         ),
+        project_service=project_service,
     )
 
 

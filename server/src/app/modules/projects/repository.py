@@ -1,0 +1,13 @@
+from typing import Protocol
+
+from app.modules.projects.models import Project
+
+
+class ProjectRepository(Protocol):
+    async def get(self, project_id: str) -> Project | None: ...
+
+    async def save_new(self, project: Project, ttl_seconds: int) -> None: ...
+
+    async def save_existing(self, project: Project) -> bool: ...
+
+    async def delete(self, project_id: str) -> None: ...

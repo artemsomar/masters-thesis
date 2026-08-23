@@ -1,0 +1,29 @@
+from datetime import datetime
+
+from pydantic import Field
+
+from app.api.schemas.diagram_sessions import ApiSchema
+
+
+class CreateProjectRequest(ApiSchema):
+    name: str = Field(default="Untitled diagram", max_length=120)
+
+
+class ProjectMetadataResponse(ApiSchema):
+    project_id: str = Field(serialization_alias="projectId")
+    name: str
+    updated_at: datetime = Field(serialization_alias="updatedAt")
+    expires_at: datetime = Field(serialization_alias="expiresAt")
+
+
+class CreateProjectResponse(ProjectMetadataResponse):
+    project_token: str = Field(serialization_alias="projectToken")
+    document_xml: str = Field(serialization_alias="documentXml")
+
+
+class ProjectResponse(ProjectMetadataResponse):
+    document_xml: str = Field(serialization_alias="documentXml")
+
+
+class UpdateProjectRequest(ApiSchema):
+    document_xml: str = Field(min_length=1, max_length=2_000_000, validation_alias="documentXml")
