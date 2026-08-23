@@ -1,0 +1,44 @@
+.progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.spinner {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 24px;
+  place-items: center;
+  border: 3px solid #d8ddec;
+  border-top-color: #4b41e1;
+  border-radius: 50%;
+  color: #4b41e1;
+  animation: spin 2.4s linear infinite;
+}
+
+.spinner svg {
+  animation: spin 1s linear infinite;
+}
+
+.progress h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 24px;
+}
+
+.progress p {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

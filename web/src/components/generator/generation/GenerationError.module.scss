@@ -1,0 +1,38 @@
+.error {
+  display: flex;
+  max-width: 470px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #b91c1c;
+}
+
+.error h1 {
+  margin: 16px 0 0;
+  color: #1e293b;
+  font-size: 25px;
+}
+
+.error p {
+  margin: 12px 0 24px;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.error a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 7px;
+  padding: 11px 15px;
+  background: #4b41e1;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.error .secondary {
+  margin-top: 10px;
+  background: transparent;
+  color: #475569;
+}

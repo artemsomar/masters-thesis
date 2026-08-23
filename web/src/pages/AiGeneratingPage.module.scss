@@ -1,0 +1,28 @@
+.page {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+.state {
+  display: grid;
+  min-height: calc(100vh - 56px);
+  place-content: center;
+  justify-items: center;
+  padding: 30px;
+  color: #b91c1c;
+  text-align: center;
+}
+
+.state h1 {
+  margin: 14px 0 0;
+  color: #1e293b;
+}
+
+.state p {
+  color: #64748b;
+}
+
+.state a {
+  color: #4b41e1;
+  font-weight: 700;
+}
