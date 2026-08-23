@@ -1,0 +1,35 @@
+.editor {
+  display: flex;
+  height: calc(100vh - 56px);
+  min-height: 540px;
+}
+.state {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  min-height: calc(100vh - 56px);
+  padding: 24px;
+  text-align: center;
+  color: #475569;
+}
+.state h1 {
+  margin: 14px 0 6px;
+  color: #1e293b;
+  font-size: 22px;
+}
+.state p {
+  margin: 0 0 18px;
+}
+.state a {
+  color: #4b41e1;
+  font-weight: 700;
+  text-decoration: none;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

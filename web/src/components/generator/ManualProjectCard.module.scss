@@ -1,0 +1,60 @@
+.card {
+  padding: 28px;
+  border: 1px solid #d9dde3;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+.icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 22px;
+  place-items: center;
+  border-radius: 9px;
+  background: #eef0ff;
+  color: #4b41e1;
+}
+.card h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 20px;
+}
+.card p {
+  margin: 10px 0 24px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.card button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #4b41e1;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.card button:hover {
+  background: #3d35c8;
+}
+.card button:disabled {
+  opacity: 0.7;
+}
+.error {
+  display: block;
+  margin-top: 14px;
+  color: #b91c1c;
+  font-size: 12px;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

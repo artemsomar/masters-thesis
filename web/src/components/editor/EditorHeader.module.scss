@@ -1,0 +1,46 @@
+.header {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  background: #fff;
+  border-bottom: 1px solid #d9dde3;
+}
+.header strong {
+  display: block;
+  color: #1e293b;
+  font-size: 15px;
+}
+.header span {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.saveState {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.saved {
+  color: #15803d;
+}
+.saving {
+  color: #4b41e1;
+}
+.failed {
+  color: #b91c1c;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,52 @@
+.sidebar {
+  width: 220px;
+  flex: 0 0 220px;
+  padding: 20px 12px;
+  background: #fff;
+  border-right: 1px solid #d9dde3;
+  display: flex;
+  flex-direction: column;
+}
+.project {
+  display: grid;
+  gap: 4px;
+  padding: 0 12px 22px;
+  color: #1e293b;
+}
+.project strong {
+  font-size: 15px;
+}
+.project span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+}
+.navigation {
+  display: grid;
+  gap: 4px;
+}
+.link,
+.disabled {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+}
+.link:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+.active {
+  background: #eef0ff;
+  color: #4b41e1;
+}
+.disabled {
+  color: #cbd5e1;
+}

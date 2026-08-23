@@ -1,0 +1,30 @@
+.palette {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  padding: 4px;
+  border: 1px solid #d9dde3;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+}
+.palette button {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #475569;
+}
+.palette button:hover {
+  background: #f1f5f9;
+}
+.palette .selected {
+  color: #4b41e1;
+  background: #eef0ff;
+}

@@ -1,0 +1,44 @@
+.main {
+  flex: 1;
+  padding: 64px clamp(30px, 8vw, 128px);
+  background-image: radial-gradient(#dbe0e8 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.content {
+  max-width: 890px;
+}
+.kicker {
+  margin: 0 0 12px;
+  color: #4b41e1;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.content h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: clamp(34px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.lead {
+  max-width: 620px;
+  margin: 18px 0 38px;
+  color: #64748b;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.72fr);
+  gap: 18px;
+}
+@media (max-width: 780px) {
+  .main {
+    padding: 42px 24px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}

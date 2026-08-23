@@ -1,0 +1,117 @@
+.workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.editorHeader {
+  height: 70px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #d9dde3;
+}
+.editorHeader strong {
+  display: block;
+  font-size: 15px;
+  color: #1e293b;
+}
+.editorHeader span {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.editorBody {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+}
+.canvasArea {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+}
+.quickAdd {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 2;
+  display: grid;
+  gap: 6px;
+}
+.quickAdd button {
+  padding: 7px 10px;
+  background: #fff;
+  border: 1px solid #d9dde3;
+  border-radius: 5px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+.quickAdd button:hover {
+  color: #4b41e1;
+  border-color: #4b41e1;
+}
+.zoom {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border: 1px solid #d9dde3;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.1);
+}
+.zoom button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #475569;
+}
+.zoom button:hover {
+  background: #f1f5f9;
+}
+.zoom span {
+  min-width: 42px;
+  text-align: center;
+  font-size: 11px;
+  color: #475569;
+}
+.saveState {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.saved {
+  color: #15803d;
+}
+.saving {
+  color: #4b41e1;
+}
+.failed {
+  color: #b91c1c;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

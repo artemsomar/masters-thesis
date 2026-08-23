@@ -1,0 +1,33 @@
+{
+  "name": "blueprint-uc-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "format": "prettier --write \"src/**/*.{ts,tsx,scss}\" \"*.{json,ts}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,scss}\" \"*.{json,ts}\""
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.102.1",
+    "fast-xml-parser": "5.11.0",
+    "konva": "10.3.1",
+    "lucide-react": "1.33.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-konva": "19.2.5",
+    "react-router-dom": "7.18.2",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.1.0",
+    "prettier": "3.9.6",
+    "sass": "1.103.1",
+    "typescript": "7.0.2",
+    "vite": "8.2.2"
+  }
+}
