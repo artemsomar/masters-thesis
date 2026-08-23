@@ -1,0 +1,52 @@
+.question {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid #d9dde3;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.prompt {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.prompt em {
+  color: #64748b;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.question textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  padding: 11px 12px;
+  color: #1e293b;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.question textarea:focus {
+  border-color: #4b41e1;
+  outline: 2px solid rgb(75 65 225 / 18%);
+}
+
+.question textarea[aria-invalid='true'] {
+  border-color: #b91c1c;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 13px;
+}

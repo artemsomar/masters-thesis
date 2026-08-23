@@ -1,4 +1,4 @@
-import type { ProjectAccess } from '../types/project';
+import type { ProjectAccess } from '../../types/project';
 
 const storageKey = 'blueprint-uc.project-access';
 

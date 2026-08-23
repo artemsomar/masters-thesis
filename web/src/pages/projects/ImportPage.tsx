@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { FileUp, LoaderCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { createProject, updateProject } from '../api/projects';
-import { ProjectSidebar } from '../components/layout/ProjectSidebar';
-import { saveProjectAccess } from '../lib/project-access';
-import { xmlToDocument } from '../lib/xml';
+import { createProject, updateProject } from '../../api/projects';
+import { ProjectSidebar } from '../../components/layout/ProjectSidebar';
+import { saveProjectAccess } from '../../lib/projects/project-access';
+import { xmlToDocument } from '../../lib/projects/xml';
 import styles from './ImportPage.module.scss';
 
 const nameFromFile = (file: File) => file.name.replace(/\.xml$/i, '').trim() || 'Imported diagram';
@@ -62,7 +62,11 @@ export const ImportPage = () => {
             )}
             Import and open editor
           </button>
-          {error ? <p className={styles.error}>{error}</p> : null}
+          {error ? (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          ) : null}
         </section>
       </main>
     </div>

@@ -3,7 +3,7 @@ import type { FormEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createDiagramSession } from '../../api/diagram-sessions';
-import { saveAiSessionAccess } from '../../lib/ai-session-access';
+import { saveAiSessionAccess } from '../../lib/generation/session-access';
 import { DescriptionEditor } from './prompt/DescriptionEditor';
 import { GenerateDiagramButton } from './prompt/GenerateDiagramButton';
 import { ManualProjectCard } from './ManualProjectCard';
@@ -18,7 +18,7 @@ export const GeneratorWorkspace = () => {
       createDiagramSession({
         description: description.trim(),
         language,
-        clarificationsEnabled: false,
+        clarificationsEnabled: true,
       }),
     onSuccess: (session) => {
       saveAiSessionAccess(session);

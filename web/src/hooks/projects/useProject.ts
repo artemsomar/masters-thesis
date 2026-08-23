@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getProject } from '../api/projects';
-import { queryKeys } from '../api/query-keys';
-import { getProjectAccess } from '../lib/project-access';
+import { getProject } from '../../api/projects';
+import { queryKeys } from '../../api/query-keys';
+import { getProjectAccess } from '../../lib/projects/project-access';
 
 export const useProject = (projectId: string) => {
   const access = getProjectAccess(projectId);

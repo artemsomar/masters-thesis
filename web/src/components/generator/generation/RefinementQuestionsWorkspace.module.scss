@@ -1,0 +1,76 @@
+.main {
+  min-height: calc(100vh - 56px);
+  flex: 1;
+  overflow: auto;
+  background: #f7f9fb;
+}
+
+.content {
+  width: min(760px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 56px 0;
+}
+
+.content header {
+  margin-bottom: 28px;
+}
+
+.content header span {
+  color: #4b41e1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.content h1 {
+  margin: 8px 0;
+  color: #1e293b;
+  font-size: 30px;
+}
+
+.content header p,
+.state p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.state {
+  display: grid;
+  min-height: inherit;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 30px;
+  color: #b91c1c;
+  text-align: center;
+}
+
+.state h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 24px;
+}
+
+.state button {
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 13px;
+  background: #4b41e1;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.spin {
+  color: #4b41e1;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

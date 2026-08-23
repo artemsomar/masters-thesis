@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { ArrowRight, FilePlus2, LoaderCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createProject } from '../../api/projects';
-import { saveProjectAccess } from '../../lib/project-access';
+import { saveProjectAccess } from '../../lib/projects/project-access';
 import styles from './ManualProjectCard.module.scss';
 
 export const ManualProjectCard = () => {

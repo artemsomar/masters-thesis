@@ -1,0 +1,36 @@
+.form {
+  display: grid;
+  gap: 20px;
+}
+
+.questions {
+  display: grid;
+  gap: 14px;
+}
+
+.form button {
+  justify-self: end;
+  border: 0;
+  border-radius: 7px;
+  padding: 12px 18px;
+  background: #4b41e1;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form button:hover:not(:disabled) {
+  background: #3f36c6;
+}
+
+.form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.error {
+  margin: 0;
+  color: #b91c1c;
+  line-height: 1.5;
+}

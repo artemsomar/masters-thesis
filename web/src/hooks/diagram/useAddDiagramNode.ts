@@ -1,5 +1,5 @@
-import { createActor, createBoundary, createUseCase } from '../lib/diagram/factory';
-import { useDiagramStore } from '../store/diagram-store';
+import { createActor, createBoundary, createUseCase } from '../../lib/diagram/factory';
+import { useDiagramStore } from '../../store/diagram-store';
 
 type NodeKind = 'actor' | 'useCase' | 'boundary';
 

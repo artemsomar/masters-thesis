@@ -1,19 +1,16 @@
-FROM python:3.12-slim
+# syntax=docker/dockerfile:1
+
+FROM python:3.12-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_CREATE=false
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir "poetry>=2.0,<3.0"
+COPY . .
+RUN pip install --upgrade pip && pip install .
 
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --only main --no-root --no-ansi
-
-COPY src ./src
-
-ENV PYTHONPATH=/app/src
+EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

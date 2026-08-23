@@ -1,8 +1,8 @@
 import { SVG } from '@svgdotjs/svg.js';
-import { getNodeBounds } from './diagram/geometry';
-import { getRelationPoints } from './diagram/relation-paths';
-import { getRelationStyle } from './diagram/relation-style';
-import type { DiagramDocument } from '../types/diagram';
+import { getNodeBounds } from '../diagram/geometry';
+import { getRelationPoints } from '../diagram/relation-paths';
+import { getRelationStyle } from '../diagram/relation-style';
+import type { DiagramDocument } from '../../types/diagram';
 
 const padding = 32;
 

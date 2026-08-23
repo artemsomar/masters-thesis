@@ -1,0 +1,60 @@
+services:
+  redis:
+    image: redis:7.4-alpine
+    container_name: blueprint-uc-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - blueprint-uc
+
+  api:
+    build: .
+    image: blueprint-uc-server:latest
+    container_name: blueprint-uc-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from urllib.request import urlopen; urlopen('http://localhost:8000/ready')",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      blueprint-uc:
+        aliases:
+          - blueprint-uc-api
+
+  worker:
+    build: .
+    image: blueprint-uc-server:latest
+    container_name: blueprint-uc-worker
+    restart: unless-stopped
+    command: python -m app.workers.runner
+    env_file: .env
+    environment:
+      APP_REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - blueprint-uc
+
+networks:
+  blueprint-uc:
+    name: blueprint-uc

@@ -1,13 +1,14 @@
 import { Link, useParams } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
-import { AiGenerationWorkspace } from '../components/generator/generation/AiGenerationWorkspace';
-import { ProjectSidebar } from '../components/layout/ProjectSidebar';
-import { getAiSessionAccess } from '../lib/ai-session-access';
+import { RefinementQuestionsWorkspace } from '../../components/generator/generation/RefinementQuestionsWorkspace';
+import { ProjectSidebar } from '../../components/layout/ProjectSidebar';
+import { getAiSessionAccess } from '../../lib/generation/session-access';
 import styles from './AiGeneratingPage.module.scss';
 
-export const AiGeneratingPage = () => {
+export const RefinementQuestionsPage = () => {
   const { sessionId } = useParams();
   const session = sessionId ? getAiSessionAccess(sessionId) : null;
+
   if (!session)
     return (
       <main className={styles.state}>
@@ -17,10 +18,11 @@ export const AiGeneratingPage = () => {
         <Link to="/">Back to Generator</Link>
       </main>
     );
+
   return (
     <div className={styles.page}>
       <ProjectSidebar projectName="AI generation" />
-      <AiGenerationWorkspace session={session} />
+      <RefinementQuestionsWorkspace session={session} />
     </div>
   );
 };

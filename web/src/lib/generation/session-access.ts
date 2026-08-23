@@ -1,4 +1,4 @@
-import type { DiagramSessionAccess } from '../types/api';
+import type { DiagramSessionAccess } from '../../types/api';
 
 const storageKey = 'blueprint-uc.ai-session-access';
 

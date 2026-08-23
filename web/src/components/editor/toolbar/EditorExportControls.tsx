@@ -1,10 +1,10 @@
 import type Konva from 'konva';
 import { Download, FileCode2, FileImage, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { downloadDataUrl, downloadTextFile } from '../../../lib/download';
-import { stageToPng } from '../../../lib/png-export';
-import { documentToSvg } from '../../../lib/svg-export';
-import { documentToXml } from '../../../lib/xml';
+import { downloadDataUrl, downloadTextFile } from '../../../lib/export/download';
+import { stageToPng } from '../../../lib/export/png-export';
+import { documentToSvg } from '../../../lib/export/svg-export';
+import { documentToXml } from '../../../lib/projects/xml';
 import type { DiagramDocument } from '../../../types/diagram';
 import styles from './EditorExportControls.module.scss';
 

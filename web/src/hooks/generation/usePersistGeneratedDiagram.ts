@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
-import { getGeneratedDiagram } from '../api/diagram-sessions';
-import { createProject, updateProject } from '../api/projects';
-import { autoLayoutDocument } from '../lib/diagram/auto-layout';
-import { generatedDiagramToDocument } from '../lib/diagram/generated-diagram-mapper';
-import { saveProjectAccess } from '../lib/project-access';
-import { documentToXml } from '../lib/xml';
-import type { DiagramSessionAccess } from '../types/api';
+import { getGeneratedDiagram } from '../../api/diagram-sessions';
+import { createProject, updateProject } from '../../api/projects';
+import { autoLayoutDocument } from '../../lib/diagram/auto-layout';
+import { generatedDiagramToDocument } from '../../lib/diagram/generated-diagram-mapper';
+import { saveProjectAccess } from '../../lib/projects/project-access';
+import { documentToXml } from '../../lib/projects/xml';
+import type { DiagramSessionAccess } from '../../types/api';
 
 export const usePersistGeneratedDiagram = () =>
   useMutation({

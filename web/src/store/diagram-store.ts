@@ -102,6 +102,9 @@ export const useDiagramStore = create<DiagramState>()((set) => ({
   commitInteraction: () =>
     set((state) => {
       if (!state.interactionSnapshot) return state;
+      if (JSON.stringify(state.interactionSnapshot) === JSON.stringify(state.document)) {
+        return { interactionSnapshot: undefined };
+      }
       return {
         revision: state.revision + 1,
         past: [...state.past, state.interactionSnapshot],

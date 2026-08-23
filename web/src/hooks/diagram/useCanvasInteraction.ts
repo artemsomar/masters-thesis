@@ -1,9 +1,15 @@
+import { useEffect, useRef } from 'react';
 import type Konva from 'konva';
-import { createActor, createBoundary, createRelation, createUseCase } from '../lib/diagram/factory';
-import { getNodeBounds, isInsideBounds } from '../lib/diagram/geometry';
-import { useDiagramStore } from '../store/diagram-store';
-import { useEditorUiStore } from '../store/editor-ui-store';
-import type { Point } from '../types/diagram';
+import {
+  createActor,
+  createBoundary,
+  createRelation,
+  createUseCase,
+} from '../../lib/diagram/factory';
+import { getNodeBounds, isInsideBounds } from '../../lib/diagram/geometry';
+import { useDiagramStore } from '../../store/diagram-store';
+import { useEditorUiStore } from '../../store/editor-ui-store';
+import type { Point } from '../../types/diagram';
 
 const nodeKindForTool = {
   'add-actor': 'actor',
@@ -20,6 +26,8 @@ const toDocumentPoint = (stage: Konva.Stage): Point => {
 };
 
 export const useCanvasInteraction = () => {
+  const dragFrame = useRef<number | undefined>(undefined);
+  const pendingDrag = useRef<{ id: string; position: Point } | undefined>(undefined);
   const nodes = useDiagramStore((state) => state.document.nodes);
   const addNode = useDiagramStore((state) => state.addNode);
   const addRelation = useDiagramStore((state) => state.addRelation);
@@ -34,6 +42,21 @@ export const useCanvasInteraction = () => {
   const clearSelection = useEditorUiStore((state) => state.clearSelection);
   const setActiveTool = useEditorUiStore((state) => state.setActiveTool);
   const setInteraction = useEditorUiStore((state) => state.setInteraction);
+
+  useEffect(
+    () => () => {
+      if (dragFrame.current) window.cancelAnimationFrame(dragFrame.current);
+    },
+    [],
+  );
+
+  const flushDragPosition = () => {
+    if (dragFrame.current) window.cancelAnimationFrame(dragFrame.current);
+    dragFrame.current = undefined;
+    const pending = pendingDrag.current;
+    pendingDrag.current = undefined;
+    if (pending) moveNodeLive(pending.id, pending.position);
+  };
 
   const handleStageMouseDown = (stage: Konva.Stage, targetIsStage: boolean) => {
     if (!targetIsStage) return;
@@ -104,9 +127,22 @@ export const useCanvasInteraction = () => {
     handleStageMouseMove,
     handleStageMouseUp,
     handleNodeSelect,
-    handleDragStart: beginInteraction,
-    handleDragMove: moveNodeLive,
+    handleDragStart: () => {
+      pendingDrag.current = undefined;
+      beginInteraction();
+    },
+    handleDragMove: (id: string, position: Point) => {
+      pendingDrag.current = { id, position };
+      if (dragFrame.current) return;
+      dragFrame.current = window.requestAnimationFrame(() => {
+        dragFrame.current = undefined;
+        const pending = pendingDrag.current;
+        pendingDrag.current = undefined;
+        if (pending) moveNodeLive(pending.id, pending.position);
+      });
+    },
     handleDragEnd: (id: string, position: Point) => {
+      flushDragPosition();
       moveNodeLive(id, position);
       commitInteraction();
     },

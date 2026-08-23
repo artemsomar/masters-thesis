@@ -38,6 +38,31 @@ export type DiagramSessionStatusEvent = Pick<
   correlationId?: string;
 };
 
+export type ClarificationQuestion = {
+  id: string;
+  text: string;
+  required: boolean;
+};
+
+export type ClarificationQuestionsResponse = {
+  round: number;
+  questions: ClarificationQuestion[];
+};
+
+export type ClarificationAnswer = {
+  questionId: string;
+  value: string;
+};
+
+export type SubmitClarificationAnswersRequest = {
+  round: number;
+  answers: ClarificationAnswer[];
+};
+
+export type SubmitClarificationAnswersResponse = {
+  status: DiagramSessionStatus;
+};
+
 export type GeneratedActor = { id: string; name: string; type: 'primary' | 'secondary' };
 export type GeneratedUseCase = { id: string; name: string };
 export type GeneratedRelation = {

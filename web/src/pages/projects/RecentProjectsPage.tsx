@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { Clock3, FolderOpen, LoaderCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getAvailableProjects } from '../api/projects';
-import { ProjectSidebar } from '../components/layout/ProjectSidebar';
-import { getProjectAccesses } from '../lib/project-access';
-import { queryKeys } from '../api/query-keys';
+import { getAvailableProjects } from '../../api/projects';
+import { ProjectSidebar } from '../../components/layout/ProjectSidebar';
+import { getProjectAccesses } from '../../lib/projects/project-access';
+import { queryKeys } from '../../api/query-keys';
 import styles from './RecentProjectsPage.module.scss';
 
 export const RecentProjectsPage = () => {
@@ -26,7 +26,7 @@ export const RecentProjectsPage = () => {
         {projects.isPending && access.length ? (
           <LoaderCircle className={styles.spin} size={24} />
         ) : null}
-        {!projects.isPending && !available.length ? (
+        {!access.length || (!projects.isPending && !projects.isError && !available.length) ? (
           <p className={styles.empty}>No available projects in this browser.</p>
         ) : null}
         <div className={styles.list}>
@@ -45,7 +45,12 @@ export const RecentProjectsPage = () => {
           ))}
         </div>
         {projects.isError ? (
-          <p className={styles.error}>Could not load the available projects from the server.</p>
+          <div className={styles.error} role="alert">
+            <p>Could not load the available projects from the server.</p>
+            <button type="button" onClick={() => void projects.refetch()}>
+              Try again
+            </button>
+          </div>
         ) : null}
       </main>
     </div>

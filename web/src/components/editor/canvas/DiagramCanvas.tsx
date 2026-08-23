@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type Konva from 'konva';
 import { Stage } from 'react-konva';
-import { useCanvasInteraction } from '../../../hooks/useCanvasInteraction';
+import { useCanvasInteraction } from '../../../hooks/diagram/useCanvasInteraction';
 import { useDiagramStore } from '../../../store/diagram-store';
 import { useEditorUiStore } from '../../../store/editor-ui-store';
 import { DiagramLayer } from './layers/DiagramLayer';

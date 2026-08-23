@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import type Konva from 'konva';
-import { useProjectAutosave } from '../../hooks/useProjectAutosave';
-import { useProjectDocument } from '../../hooks/useProjectDocument';
-import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { useProjectAutosave } from '../../hooks/projects/useProjectAutosave';
+import { useProjectDocument } from '../../hooks/projects/useProjectDocument';
+import { useKeyboardShortcuts } from '../../hooks/diagram/useKeyboardShortcuts';
 import { useDiagramStore } from '../../store/diagram-store';
 import { useEditorUiStore } from '../../store/editor-ui-store';
 import { DiagramCanvas } from './canvas/DiagramCanvas';
@@ -24,14 +24,14 @@ export const EditorWorkspace = ({ projectId, projectToken, documentXml, projectN
   const document = useDiagramStore((state) => state.document);
   const revision = useDiagramStore((state) => state.revision);
   const selectedIds = useEditorUiStore((state) => state.selectedIds);
-  const saveState = useProjectAutosave(projectId, projectToken, document, revision);
+  const autosave = useProjectAutosave(projectId, projectToken, document, revision);
   const selectedElement =
     document.nodes.find((node) => node.id === selectedIds[0]) ??
     document.relations.find((relation) => relation.id === selectedIds[0]);
 
   return (
     <section className={styles.workspace}>
-      <EditorHeader projectName={projectName} saveState={saveState} />
+      <EditorHeader projectName={projectName} {...autosave} />
       <div className={styles.editorBody}>
         <div className={styles.canvasArea}>
           <EditorToolPalette />

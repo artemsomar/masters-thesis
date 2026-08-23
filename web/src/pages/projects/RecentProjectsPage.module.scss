@@ -64,6 +64,18 @@
   margin-top: 18px;
   color: #b91c1c;
 }
+.error p {
+  margin: 0 0 8px;
+}
+.error button {
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  padding: 7px 10px;
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+}
 .spin {
   animation: spin 0.9s linear infinite;
 }

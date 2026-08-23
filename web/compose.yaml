@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    image: blueprint-uc-web:latest
+    container_name: blueprint-uc-web
+    restart: unless-stopped
+    environment:
+      API_HOST: blueprint-uc-api
+      API_PORT: 8000
+    ports:
+      - "8080:8080"
+    networks:
+      - blueprint-uc
+
+networks:
+  blueprint-uc:
+    external: true
+    name: blueprint-uc

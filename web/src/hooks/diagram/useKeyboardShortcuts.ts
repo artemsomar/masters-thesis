@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useDiagramStore } from '../store/diagram-store';
-import { useEditorUiStore } from '../store/editor-ui-store';
+import { useDiagramStore } from '../../store/diagram-store';
+import { useEditorUiStore } from '../../store/editor-ui-store';
 
 export const useKeyboardShortcuts = () => {
   const selectedIds = useEditorUiStore((state) => state.selectedIds);
@@ -12,7 +12,7 @@ export const useKeyboardShortcuts = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
-      if (target?.matches('input, textarea, select, [contenteditable="true"]')) return;
+      if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
         event.preventDefault();
         if (event.shiftKey) redo();

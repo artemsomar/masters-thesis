@@ -1,9 +1,9 @@
 import { Link, useParams } from 'react-router-dom';
 import { AlertTriangle, LoaderCircle } from 'lucide-react';
-import { EditorWorkspace } from '../components/editor/EditorWorkspace';
-import { ProjectSidebar } from '../components/layout/ProjectSidebar';
-import { useProject } from '../hooks/useProject';
-import { getProjectAccess } from '../lib/project-access';
+import { EditorWorkspace } from '../../components/editor/EditorWorkspace';
+import { ProjectSidebar } from '../../components/layout/ProjectSidebar';
+import { useProject } from '../../hooks/projects/useProject';
+import { getProjectAccess } from '../../lib/projects/project-access';
 import styles from './EditorPage.module.scss';
 
 export const EditorPage = () => {
@@ -33,6 +33,9 @@ export const EditorPage = () => {
         <AlertTriangle size={26} />
         <h1>Could not open the project</h1>
         <p>It may have expired or the server is unreachable.</p>
+        <button type="button" onClick={() => void project.refetch()}>
+          Try again
+        </button>
         <Link to="/">Back to Generator</Link>
       </div>
     );

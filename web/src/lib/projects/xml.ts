@@ -1,6 +1,6 @@
 import { XMLBuilder, XMLParser, XMLValidator } from 'fast-xml-parser';
-import { createEmptyDocument } from './diagram/factory';
-import type { DiagramDocument, DiagramNode, DiagramRelation, NodeStyle } from '../types/diagram';
+import { createEmptyDocument } from '../diagram/factory';
+import type { DiagramDocument, DiagramNode, DiagramRelation, NodeStyle } from '../../types/diagram';
 
 const defaultStyle: NodeStyle = { fill: '#ffffff', stroke: '#1e293b', textColor: '#1e293b' };
 

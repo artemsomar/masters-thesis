@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { AlertTriangle, LoaderCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useDiagramSession } from '../../../hooks/useDiagramSession';
-import { usePersistGeneratedDiagram } from '../../../hooks/usePersistGeneratedDiagram';
+import { useDiagramSession } from '../../../hooks/generation/useDiagramSession';
+import { usePersistGeneratedDiagram } from '../../../hooks/generation/usePersistGeneratedDiagram';
 import type { DiagramSessionAccess } from '../../../types/api';
 import { GenerationError } from './GenerationError';
 import { GenerationProgress } from './GenerationProgress';
@@ -25,6 +25,12 @@ export const AiGenerationWorkspace = ({ session }: Props) => {
     });
   }, [navigate, persist, session, status]);
 
+  useEffect(() => {
+    if (status === 'awaiting_answers') {
+      navigate(`/generating/${session.sessionId}/questions`, { replace: true });
+    }
+  }, [navigate, session.sessionId, status]);
+
   if (sessionStatus.isError)
     return (
       <main className={styles.main}>
@@ -32,6 +38,9 @@ export const AiGenerationWorkspace = ({ session }: Props) => {
           <AlertTriangle size={30} />
           <h1>Could not check generation status</h1>
           <p>The server may be unavailable. Please try again shortly.</p>
+          <button type="button" onClick={() => void sessionStatus.refetch()}>
+            Try again
+          </button>
         </section>
       </main>
     );
@@ -43,16 +52,7 @@ export const AiGenerationWorkspace = ({ session }: Props) => {
       </main>
     );
 
-  if (status === 'awaiting_answers')
-    return (
-      <main className={styles.main}>
-        <section className={styles.connectionError}>
-          <AlertTriangle size={30} />
-          <h1>Clarifications are required</h1>
-          <p>This session needs answers before it can generate a diagram.</p>
-        </section>
-      </main>
-    );
+  if (status === 'awaiting_answers') return null;
 
   if (persist.isError)
     return (
@@ -61,6 +61,15 @@ export const AiGenerationWorkspace = ({ session }: Props) => {
           <AlertTriangle size={30} />
           <h1>Could not save the generated diagram</h1>
           <p>The diagram remains in the AI session until it expires. Please start again.</p>
+          <button
+            type="button"
+            onClick={() => {
+              hasStartedPersisting.current = false;
+              persist.reset();
+            }}
+          >
+            Try saving again
+          </button>
         </section>
       </main>
     );

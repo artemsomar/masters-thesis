@@ -1,10 +1,13 @@
 import { ApiError, request } from './client';
 import type {
   CreateDiagramSessionRequest,
+  ClarificationQuestionsResponse,
   DiagramSessionAccess,
   DiagramSessionStatusEvent,
   DiagramSessionStatusResponse,
   GeneratedDiagram,
+  SubmitClarificationAnswersRequest,
+  SubmitClarificationAnswersResponse,
 } from '../types/api';
 
 const apiBase = import.meta.env.VITE_API_URL ?? '';
@@ -24,8 +27,12 @@ export const createDiagramSession = (
 export const getDiagramSessionStatus = (
   sessionId: string,
   sessionToken: string,
+  signal?: AbortSignal,
 ): Promise<DiagramSessionStatusResponse> =>
-  request(`/api/v1/diagram-sessions/${sessionId}`, { headers: authorization(sessionToken) });
+  request(`/api/v1/diagram-sessions/${sessionId}`, {
+    headers: authorization(sessionToken),
+    signal,
+  });
 
 export const getGeneratedDiagram = (
   sessionId: string,
@@ -33,6 +40,25 @@ export const getGeneratedDiagram = (
 ): Promise<GeneratedDiagram> =>
   request(`/api/v1/diagram-sessions/${sessionId}/diagram`, {
     headers: authorization(sessionToken),
+  });
+
+export const getClarificationQuestions = (
+  sessionId: string,
+  sessionToken: string,
+): Promise<ClarificationQuestionsResponse> =>
+  request(`/api/v1/diagram-sessions/${sessionId}/questions`, {
+    headers: authorization(sessionToken),
+  });
+
+export const submitClarificationAnswers = (
+  sessionId: string,
+  sessionToken: string,
+  payload: SubmitClarificationAnswersRequest,
+): Promise<SubmitClarificationAnswersResponse> =>
+  request(`/api/v1/diagram-sessions/${sessionId}/answers`, {
+    method: 'POST',
+    headers: authorization(sessionToken),
+    body: JSON.stringify(payload),
   });
 
 type StatusStreamHandlers = {
@@ -48,7 +74,11 @@ const dispatchEvent = (frame: string, onStatus: StatusStreamHandlers['onStatus']
     ?.slice('data:'.length)
     .trim();
   if (!dataLine) return;
-  onStatus(JSON.parse(dataLine) as DiagramSessionStatusEvent);
+  try {
+    onStatus(JSON.parse(dataLine) as DiagramSessionStatusEvent);
+  } catch {
+    // Ignore a malformed frame; the status query remains the source of recovery.
+  }
 };
 
 export const openDiagramSessionStatusStream = (
