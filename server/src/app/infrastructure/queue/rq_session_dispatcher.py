@@ -14,12 +14,16 @@ class RqSessionJobDispatcher:
         job_timeout_seconds: int,
         max_attempts: int,
         retry_intervals_seconds: list[int],
+        evaluation_job_timeout_seconds: int | None = None,
     ) -> None:
         self._queue = Queue(queue_name, connection=connection)
         self._connection = connection
         self._job_timeout_seconds = job_timeout_seconds
         self._max_attempts = max_attempts
         self._retry_intervals_seconds = retry_intervals_seconds
+        self._evaluation_job_timeout_seconds = (
+            evaluation_job_timeout_seconds or job_timeout_seconds
+        )
 
     def dispatch_session_processing(self, session_id: str, job_id: str) -> None:
         self._queue.enqueue(
@@ -32,6 +36,20 @@ class RqSessionJobDispatcher:
                 interval=self._retry_intervals_seconds[: self._max_attempts - 1],
             ),
             on_failure="app.workers.tasks.mark_session_processing_failed",
+            meta={"correlation_id": get_correlation_id()},
+        )
+
+    def dispatch_evaluation_run(self, run_id: str, job_id: str) -> None:
+        self._queue.enqueue(
+            "app.workers.tasks.process_evaluation_run",
+            run_id,
+            job_id=job_id,
+            job_timeout=self._evaluation_job_timeout_seconds,
+            retry=Retry(
+                max=self._max_attempts - 1,
+                interval=self._retry_intervals_seconds[: self._max_attempts - 1],
+            ),
+            on_failure="app.workers.tasks.mark_evaluation_run_processing_failed",
             meta={"correlation_id": get_correlation_id()},
         )
 

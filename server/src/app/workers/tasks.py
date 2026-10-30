@@ -7,6 +7,7 @@ from rq.job import Job
 
 from app.bootstrap import build_container
 from app.infrastructure.llm.client import LlmProviderError
+from app.modules.evaluation.run_errors import EvaluationRunNotFound
 from app.modules.sessions.errors import SessionNotFound
 
 logger = structlog.get_logger(__name__)
@@ -54,4 +55,49 @@ async def _mark_session_as_failed(session_id: str) -> None:
     try:
         await container.session_service.fail(session_id, "session_processing_failed")
     except SessionNotFound:
+        return
+
+
+def process_evaluation_run(run_id: str) -> None:
+    job = get_current_job()
+    if job is not None and isinstance(job.meta.get("correlation_id"), str):
+        structlog.contextvars.bind_contextvars(correlation_id=job.meta["correlation_id"])
+    container = build_container()
+    try:
+        asyncio.run(container.evaluation_run_workflow.process_run(run_id))
+    except LlmProviderError:
+        logger.warning(
+            "evaluation_run_processing_retry_scheduled",
+            run_id=run_id,
+            retries_left=job.retries_left if job is not None else None,
+        )
+        raise
+    except EvaluationRunNotFound:
+        logger.info("evaluation_run_processing_cancelled", run_id=run_id)
+    except Exception:
+        logger.exception("evaluation_run_processing_failed", run_id=run_id)
+        asyncio.run(_mark_evaluation_run_as_failed(run_id))
+    finally:
+        structlog.contextvars.clear_contextvars()
+
+
+def mark_evaluation_run_processing_failed(
+    job: Job,
+    _: Redis,
+    __: type[BaseException],
+    ___: BaseException,
+    ____: object,
+) -> None:
+    if job.should_retry:
+        return
+    run_id = str(job.args[0])
+    logger.error("evaluation_run_processing_retries_exhausted", run_id=run_id)
+    asyncio.run(_mark_evaluation_run_as_failed(run_id))
+
+
+async def _mark_evaluation_run_as_failed(run_id: str) -> None:
+    container = build_container()
+    try:
+        await container.evaluation_run_service.fail(run_id, "evaluation_run_processing_failed")
+    except EvaluationRunNotFound:
         return
