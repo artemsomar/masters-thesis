@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from app.modules.diagrams.schemas import Diagram
+from app.modules.diagrams.contracts.results import DiagramQualityReport, PipelineVersions
 from app.modules.evaluation.enums import EvaluationRelationType
 
 
@@ -110,6 +111,31 @@ class DiagramEvaluationResult(EvaluationSchema):
         serialization_alias="generatedDiagram",
         description="Generated diagram, absent when it is not UML-valid.",
     )
+    initial_diagram: Diagram | None = Field(
+        default=None,
+        validation_alias=AliasChoices("initial_diagram", "initialDiagram"),
+        serialization_alias="initialDiagram",
+        description="Diagram assembled directly from the LLM's frame extraction output, "
+        "before defect correction and assurance.",
+    )
+    final_diagram: Diagram | None = Field(
+        default=None,
+        validation_alias=AliasChoices("final_diagram", "finalDiagram"),
+        serialization_alias="finalDiagram",
+        description="Diagram after deterministic UML assurance.",
+    )
+    quality_report: DiagramQualityReport | None = Field(
+        default=None,
+        validation_alias=AliasChoices("quality_report", "qualityReport"),
+        serialization_alias="qualityReport",
+        description="Pipeline diagnostics and automatic assurance fixes.",
+    )
+    pipeline_versions: PipelineVersions | None = Field(
+        default=None,
+        validation_alias=AliasChoices("pipeline_versions", "pipelineVersions"),
+        serialization_alias="pipelineVersions",
+        description="Versions of prompts, rules, embeddings, and thresholds used in the run.",
+    )
     diagram_prompt_version: str | None = Field(
         validation_alias=AliasChoices("diagram_prompt_version", "diagramPromptVersion"),
         serialization_alias="diagramPromptVersion",
@@ -139,4 +165,22 @@ class DiagramEvaluationResult(EvaluationSchema):
         validation_alias=AliasChoices("relationship_scores", "relationshipScores"),
         serialization_alias="relationshipScores",
         description="Strict relation scores after semantic node matching.",
+    )
+    initial_actor_score: F1Score | None = Field(
+        default=None,
+        validation_alias=AliasChoices("initial_actor_score", "initialActorScore"),
+        serialization_alias="initialActorScore",
+        description="Semantic matching score for actors in the initial diagram.",
+    )
+    initial_use_case_score: F1Score | None = Field(
+        default=None,
+        validation_alias=AliasChoices("initial_use_case_score", "initialUseCaseScore"),
+        serialization_alias="initialUseCaseScore",
+        description="Semantic matching score for use cases in the initial diagram.",
+    )
+    initial_relationship_scores: RelationshipScores | None = Field(
+        default=None,
+        validation_alias=AliasChoices("initial_relationship_scores", "initialRelationshipScores"),
+        serialization_alias="initialRelationshipScores",
+        description="Strict relation scores for the initial diagram after semantic node matching.",
     )

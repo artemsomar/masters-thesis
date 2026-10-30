@@ -4,7 +4,8 @@ import sys
 from itertools import islice
 from pathlib import Path
 
-from app.bootstrap import build_evaluation_container
+from app.bootstrap import build_container
+from app.config import get_settings
 from app.errors import AppError
 from app.infrastructure.llm.client import LlmProviderError
 
@@ -54,9 +55,13 @@ async def run(
     use_case_similarity_threshold: float,
     limit: int | None,
 ) -> None:
-    container = build_evaluation_container(
-        actor_similarity_threshold, use_case_similarity_threshold
+    settings = get_settings().model_copy(
+        update={
+            "evaluation_actor_similarity_threshold": actor_similarity_threshold,
+            "evaluation_use_case_similarity_threshold": use_case_similarity_threshold,
+        }
     )
+    container = build_container(settings)
     cases = container.evaluation_service.load_cases(dataset_path)
     for case in islice(cases, limit):
         result = await container.evaluation_workflow.evaluate_case(case)

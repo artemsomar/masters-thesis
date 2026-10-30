@@ -4,7 +4,7 @@ from pathlib import Path
 
 from app.modules.evaluation.dataset_reader import EvaluationDatasetReader
 from app.modules.evaluation.errors import EvaluationDescriptionTooLong
-from app.modules.evaluation.matching import NodeMatching, match_nodes
+from app.modules.evaluation.matching import NodeMatching, match_nodes, match_use_cases
 from app.modules.evaluation.metrics import score_relations
 from app.modules.evaluation.ports import EmbeddingClient
 from app.modules.evaluation.schemas import ComparableDiagram, EvaluationCase, RelationshipScores
@@ -42,7 +42,11 @@ class EvaluationService:
             raise EvaluationDescriptionTooLong(case.case_id)
 
     async def compare(
-        self, reference: ComparableDiagram, generated: ComparableDiagram
+        self,
+        reference: ComparableDiagram,
+        generated: ComparableDiagram,
+        *,
+        system_description: str,
     ) -> EvaluationComparison:
         actor_matching = await match_nodes(
             reference.actors,
@@ -50,9 +54,10 @@ class EvaluationService:
             self._actor_similarity_threshold,
             self._embedding_client,
         )
-        use_case_matching = await match_nodes(
+        use_case_matching = await match_use_cases(
             reference.use_cases,
             generated.use_cases,
+            system_description,
             self._use_case_similarity_threshold,
             self._embedding_client,
         )

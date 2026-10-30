@@ -44,6 +44,40 @@ async def match_nodes(
     return NodeMatching(mapping, build_f1_score(len(mapping), len(reference), len(generated)))
 
 
+async def match_use_cases(
+    reference: list[EvaluationNode],
+    generated: list[EvaluationNode],
+    system_description: str,
+    similarity_threshold: float,
+    embedding_client: EmbeddingClient,
+) -> NodeMatching:
+    """Match use cases by their meaning within the evaluated system's context."""
+    if not reference or not generated:
+        return NodeMatching({}, build_f1_score(0, len(reference), len(generated)))
+    vectors = await embedding_client.embed(
+        [
+            _use_case_embedding_text(system_description, node.name)
+            for node in [*reference, *generated]
+        ]
+    )
+    if len(vectors) != len(reference) + len(generated):
+        raise InvalidEmbeddingResult()
+    reference_vectors = vectors[: len(reference)]
+    generated_vectors = vectors[len(reference) :]
+    similarities = _similarity_matrix(reference_vectors, generated_vectors)
+    assignments = maximum_weight_assignment(similarities)
+    mapping = {
+        reference[row_index].id: generated[column_index].id
+        for row_index, column_index in assignments
+        if similarities[row_index][column_index] >= similarity_threshold
+    }
+    return NodeMatching(mapping, build_f1_score(len(mapping), len(reference), len(generated)))
+
+
+def _use_case_embedding_text(system_description: str, use_case_name: str) -> str:
+    return "System description:\n" f"{system_description}\n\n" "Use case:\n" f"{use_case_name}"
+
+
 def _similarity_matrix(
     reference_vectors: EmbeddingMatrix, generated_vectors: EmbeddingMatrix
 ) -> EmbeddingMatrix:

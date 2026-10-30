@@ -23,8 +23,8 @@ def test_evaluation_generation_does_not_include_the_reference_diagram_in_the_pro
             FakeEmbeddingClient(
                 {
                     "Client": [1.0, 0.0],
-                    "Book service": [0.0, 1.0],
-                    reference_marker: [0.0, 1.0],
+                    _use_case_text("A client books a service.", "Book service"): [0.0, 1.0],
+                    _use_case_text("A client books a service.", reference_marker): [0.0, 1.0],
                 }
             ),
             20_000,
@@ -55,16 +55,26 @@ def test_evaluation_generation_does_not_include_the_reference_diagram_in_the_pro
 def _diagram() -> Diagram:
     return Diagram(
         schema_version="1.0",
-        system=DiagramSystem(id="booking-system", name="Booking system"),
-        actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
-        use_cases=[UseCase(id="book-service", name="Book service")],
+        system=DiagramSystem(
+            id="booking-system", name="Booking system", spans=[], origin="unverified"
+        ),
+        actors=[
+            Actor(id="client", name="Client", type=ActorType.PRIMARY, spans=[], origin="unverified")
+        ],
+        use_cases=[UseCase(id="book-service", name="Book service", spans=[], origin="unverified")],
         relations=[
             DiagramRelation(
                 type=RelationType.ASSOCIATION,
                 source_id="client",
                 target_id="book-service",
+                spans=[],
+                origin="unverified",
             )
         ],
         assumptions=[],
         warnings=[],
     )
+
+
+def _use_case_text(description: str, name: str) -> str:
+    return f"System description:\n{description}\n\nUse case:\n{name}"
