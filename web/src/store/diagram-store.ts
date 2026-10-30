@@ -28,6 +28,7 @@ type DiagramState = {
   deleteElements: (ids: string[]) => void;
   addRelation: (relation: DiagramRelation) => void;
   updateRelation: (id: string, changes: Partial<Omit<DiagramRelation, 'id'>>) => void;
+  moveRelationAnchorLive: (id: string, end: 'source' | 'target', angle: number) => void;
   beginInteraction: () => void;
   moveNodeLive: (id: string, position: Point) => void;
   resizeNodeLive: (id: string, position: Point, size: { width: number; height: number }) => void;
@@ -89,6 +90,17 @@ export const useDiagramStore = create<DiagramState>()((set) => ({
         ),
       }),
     ),
+  moveRelationAnchorLive: (id, end, angle) =>
+    set((state) => ({
+      document: {
+        ...state.document,
+        relations: state.document.relations.map((relation) =>
+          relation.id === id
+            ? { ...relation, [end === 'source' ? 'sourceAngle' : 'targetAngle']: angle }
+            : relation,
+        ),
+      },
+    })),
   beginInteraction: () =>
     set((state) =>
       state.interactionSnapshot ? state : { interactionSnapshot: structuredClone(state.document) },

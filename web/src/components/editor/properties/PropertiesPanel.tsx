@@ -13,6 +13,7 @@ export const PropertiesPanel = ({ element }: Props) => {
   const updateNode = useDiagramStore((state) => state.updateNode);
   const updateRelation = useDiagramStore((state) => state.updateRelation);
   const deleteElements = useDiagramStore((state) => state.deleteElements);
+  const nodes = useDiagramStore((state) => state.document.nodes);
   const isRelation = element && 'sourceId' in element;
   return (
     <aside className={styles.panel}>
@@ -23,6 +24,7 @@ export const PropertiesPanel = ({ element }: Props) => {
           {isRelation ? (
             <RelationProperties
               relation={element}
+              nodes={nodes}
               onUpdate={(changes) => updateRelation(element.id, changes)}
             />
           ) : element.kind === 'actor' ? (

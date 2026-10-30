@@ -1,10 +1,10 @@
 import { Arrow } from 'react-konva';
-import { getNodeCenter } from '../../../../lib/diagram/geometry';
+import { getNodeEdgePoint } from '../../../../lib/diagram/relation-paths';
 import type { DiagramNode, Point } from '../../../../types/diagram';
 
 export const ConnectionPreview = ({ source, point }: { source?: DiagramNode; point?: Point }) => {
   if (!source || !point) return null;
-  const sourcePoint = getNodeCenter(source);
+  const sourcePoint = getNodeEdgePoint(source, point);
   return (
     <Arrow
       points={[sourcePoint.x, sourcePoint.y, point.x, point.y]}

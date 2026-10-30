@@ -43,18 +43,23 @@ export const DiagramLayer = ({
     return <UseCaseNode key={node.id} node={node} {...callbacks} />;
   };
   return (
-    <Layer>
-      {relations.map((relation) => (
-        <RelationEdge
-          key={relation.id}
-          relation={relation}
-          nodesById={nodesById}
-          selected={selectedIds.includes(relation.id)}
-          onSelect={() => onSelectRelation(relation.id)}
-        />
-      ))}
-      {nodes.filter((node) => node.kind === 'boundary').map(renderNode)}
-      {nodes.filter((node) => node.kind !== 'boundary').map(renderNode)}
-    </Layer>
+    <>
+      <Layer>
+        {nodes.filter((node) => node.kind === 'boundary').map(renderNode)}
+        {nodes.filter((node) => node.kind !== 'boundary').map(renderNode)}
+      </Layer>
+      <Layer name="relations-layer">
+        {relations.map((relation) => (
+          <RelationEdge
+            key={relation.id}
+            relation={relation}
+            nodesById={nodesById}
+            selected={selectedIds.includes(relation.id)}
+            selectable={draggable}
+            onSelect={() => onSelectRelation(relation.id)}
+          />
+        ))}
+      </Layer>
+    </>
   );
 };
