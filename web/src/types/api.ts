@@ -13,7 +13,6 @@ export type DiagramSessionStatus =
 export type CreateDiagramSessionRequest = {
   description: string;
   language: string;
-  clarificationsEnabled: boolean;
 };
 
 export type DiagramSessionAccess = {

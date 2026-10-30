@@ -13,12 +13,14 @@ async def publish_status(event_publisher: SessionEventPublisher, session: Diagra
         "session_status_changed",
         session_id=session.id,
         status=session.status,
+        phase=session.phase,
         error_code=session.error_code,
     )
     await event_publisher.publish_status(
         session.id,
         SessionStatusUpdate(
             status=session.status,
+            phase=session.phase,
             error_code=session.error_code,
             correlation_id=get_correlation_id(),
         ),

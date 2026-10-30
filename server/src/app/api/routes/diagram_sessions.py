@@ -9,11 +9,8 @@ from app.api.schemas.diagram_sessions import (
     CreateDiagramSessionRequest,
     CreateDiagramSessionResponse,
     DiagramPendingResponse,
-    QuestionsResponse,
     SessionStatusEvent,
     SessionStatusResponse,
-    SubmitAnswersRequest,
-    SubmitAnswersResponse,
 )
 from app.bootstrap import ApplicationContainer
 from app.modules.diagrams.schemas import Diagram
@@ -34,7 +31,6 @@ async def create_session(
         request.description,
         request.language,
         client_address,
-        request.clarifications_enabled,
     )
     session = created_session.session
     return CreateDiagramSessionResponse(
@@ -71,33 +67,6 @@ async def stream_session_events(
     )
 
 
-@router.get("/{session_id}/questions", response_model=QuestionsResponse)
-async def get_questions(
-    session: DiagramSession = Depends(get_authorized_session),
-    container: ApplicationContainer = Depends(get_container),
-) -> QuestionsResponse:
-    session_questions = await container.session_service.get_questions(session.id)
-    return QuestionsResponse(round=session_questions.round, questions=session_questions.questions)
-
-
-@router.post(
-    "/{session_id}/answers",
-    response_model=SubmitAnswersResponse,
-    status_code=status.HTTP_202_ACCEPTED,
-)
-async def submit_answers(
-    request: SubmitAnswersRequest,
-    session: DiagramSession = Depends(get_authorized_session),
-    container: ApplicationContainer = Depends(get_container),
-    # idempotency_key: Annotated[str, Header(alias="Idempotency-Key")],
-    # TODO: Add Idempotency-Key validation and persistent deduplication before production.
-) -> SubmitAnswersResponse:
-    updated_session = await container.diagram_session_workflow.submit_answers(
-        session.id, request.round, request.answers
-    )
-    return SubmitAnswersResponse(status=updated_session.status)
-
-
 @router.get("/{session_id}/diagram", response_model=Diagram | DiagramPendingResponse)
 async def get_diagram(
     session: DiagramSession = Depends(get_authorized_session),
@@ -131,6 +100,7 @@ async def _event_stream(
         else:
             payload = SessionStatusEvent(
                 status=event.status,
+                phase=event.phase,
                 error_code=event.error_code,
                 correlation_id=event.correlation_id,
             ).model_dump_json(by_alias=True, exclude_none=True)

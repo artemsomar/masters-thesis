@@ -18,7 +18,6 @@ export const GeneratorWorkspace = () => {
       createDiagramSession({
         description: description.trim(),
         language,
-        clarificationsEnabled: true,
       }),
     onSuccess: (session) => {
       saveAiSessionAccess(session);

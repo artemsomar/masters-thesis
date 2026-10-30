@@ -12,9 +12,10 @@ class ApiSchema(BaseModel):
 
 
 class CreateDiagramSessionRequest(ApiSchema):
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
     description: str = Field(min_length=1)
     language: str = Field(min_length=2, max_length=10)
-    clarifications_enabled: bool = Field(default=True, validation_alias="clarificationsEnabled")
 
 
 class CreateDiagramSessionResponse(ApiSchema):
@@ -48,6 +49,7 @@ class SubmitAnswersResponse(ApiSchema):
 
 class SessionStatusEvent(ApiSchema):
     status: SessionStatus
+    phase: str | None = None
     error_code: str | None = Field(default=None, serialization_alias="errorCode")
     correlation_id: str | None = Field(default=None, serialization_alias="correlationId")
 

@@ -23,6 +23,11 @@ class DiagramSession:
     clarification_prompt_version: str | None = None
     diagram_json: str | None = None
     diagram_prompt_version: str | None = None
+    raw_diagram_json: str | None = None
+    final_diagram_json: str | None = None
+    quality_report_json: str | None = None
+    pipeline_versions_json: str | None = None
+    phase: str | None = None
     error_code: str | None = None
 
 

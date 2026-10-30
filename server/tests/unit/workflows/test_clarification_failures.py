@@ -2,8 +2,6 @@ import asyncio
 
 import pytest
 
-from app.modules.clarifications.schemas import ClarificationQuestion, ClarificationResult
-from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.enums import ActorType, RelationType
 from app.modules.diagrams.schemas import Actor, Diagram, DiagramRelation, DiagramSystem, UseCase
 from app.modules.diagrams.service import DiagramService
@@ -20,7 +18,7 @@ from tests.fakes.fake_sessions import (
 
 
 @pytest.mark.unit
-def test_invalid_clarification_result_marks_the_session_as_failed() -> None:
+def test_noninteractive_workflow_generates_a_diagram() -> None:
     async def scenario() -> None:
         repository = FakeSessionRepository()
         session_service = SessionService(
@@ -32,35 +30,43 @@ def test_invalid_clarification_result_marks_the_session_as_failed() -> None:
             20_000,
             2_000,
         )
-        clarification_service = ClarificationService(
-            FakeStructuredLlmClient(
-                ClarificationResult(
-                    questions=[
-                        ClarificationQuestion(
-                            id=f"question-{index}", text="Clarify this requirement"
-                        )
-                        for index in range(8)
-                    ]
-                )
-            ),
-            max_questions_per_round=7,
-        )
         workflow = DiagramSessionWorkflow(
             session_service,
             FakeSessionJobDispatcher(),
-            clarification_service,
             DiagramService(
                 FakeStructuredLlmClient(
                     Diagram(
                         schema_version="1.0",
-                        system=DiagramSystem(id="booking-system", name="Booking system"),
-                        actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
-                        use_cases=[UseCase(id="book-service", name="Book service")],
+                        system=DiagramSystem(
+                            id="booking-system",
+                            name="Booking system",
+                            spans=[],
+                            origin="unverified",
+                        ),
+                        actors=[
+                            Actor(
+                                id="client",
+                                name="Client",
+                                type=ActorType.PRIMARY,
+                                spans=[],
+                                origin="unverified",
+                            )
+                        ],
+                        use_cases=[
+                            UseCase(
+                                id="book-service",
+                                name="Book service",
+                                spans=[],
+                                origin="unverified",
+                            )
+                        ],
                         relations=[
                             DiagramRelation(
                                 type=RelationType.ASSOCIATION,
                                 source_id="client",
                                 target_id="book-service",
+                                spans=[],
+                                origin="unverified",
                             )
                         ],
                         assumptions=[],
@@ -68,13 +74,13 @@ def test_invalid_clarification_result_marks_the_session_as_failed() -> None:
                     )
                 )
             ),
-            max_clarification_rounds=3,
         )
-        session, _ = await session_service.create("A booking system", "en", "127.0.0.1")
+        created_session = await session_service.create("A booking system", "en", "127.0.0.1")
+        session = created_session.session
         await session_service.transition(session.id, SessionStatus.ANALYZING)
 
         await workflow.process_session(session.id)
 
-        assert (await session_service.get(session.id)).status is SessionStatus.FAILED
+        assert (await session_service.get(session.id)).status is SessionStatus.DIAGRAM_READY
 
     asyncio.run(scenario())

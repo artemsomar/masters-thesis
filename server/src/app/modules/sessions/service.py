@@ -45,7 +45,7 @@ class SessionService:
         description: str,
         language: str,
         client_address: str,
-        clarifications_enabled: bool = True,
+        clarifications_enabled: bool = False,
     ) -> CreatedDiagramSession:
         validate_description(description, self._max_description_length)
         token = create_token()
@@ -95,6 +95,14 @@ class SessionService:
         session.current_job_id = job_id
         self._touch(session)
         await self._repository.save(session)
+        return session
+
+    async def set_phase(self, session_id: str, phase: str) -> DiagramSession:
+        session = await self._get(session_id)
+        session.phase = phase
+        self._touch(session)
+        await self._repository.save(session)
+        await self._publish_status(session)
         return session
 
     async def save_clarification_result(
@@ -161,6 +169,29 @@ class SessionService:
             raise InvalidSessionState()
         session.diagram_json = diagram_json
         session.diagram_prompt_version = prompt_version
+        session.status = SessionStatus.DIAGRAM_READY
+        self._touch(session)
+        await self._repository.save(session)
+        await self._publish_status(session)
+        return session
+
+    async def save_pipeline_result(
+        self,
+        session_id: str,
+        raw_diagram_json: str,
+        final_diagram_json: str,
+        quality_report_json: str,
+        pipeline_versions_json: str,
+    ) -> DiagramSession:
+        session = await self._get(session_id)
+        if not is_allowed(session.status, SessionStatus.DIAGRAM_READY):
+            raise InvalidSessionState()
+        session.raw_diagram_json = raw_diagram_json
+        session.final_diagram_json = final_diagram_json
+        session.quality_report_json = quality_report_json
+        session.pipeline_versions_json = pipeline_versions_json
+        session.diagram_json = final_diagram_json
+        session.phase = None
         session.status = SessionStatus.DIAGRAM_READY
         self._touch(session)
         await self._repository.save(session)

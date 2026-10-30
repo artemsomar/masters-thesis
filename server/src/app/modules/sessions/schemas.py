@@ -32,5 +32,6 @@ class ClarificationHistoryEntry(SessionSchema):
 
 class SessionStatusUpdate(SessionSchema):
     status: SessionStatus
+    phase: str | None = None
     error_code: str | None = Field(default=None, serialization_alias="errorCode")
     correlation_id: str | None = Field(default=None, serialization_alias="correlationId")

@@ -4,8 +4,6 @@ from typing import TypeVar, cast
 import pytest
 from pydantic import BaseModel
 
-from app.modules.clarifications.schemas import ClarificationResult
-from app.modules.clarifications.service import ClarificationService
 from app.modules.diagrams.enums import ActorType, RelationType
 from app.modules.diagrams.schemas import (
     Actor,
@@ -44,14 +42,13 @@ def test_cancelled_session_cannot_store_a_generated_diagram() -> None:
             20_000,
             2_000,
         )
-        session, _ = await session_service.create("A booking system", "en", "127.0.0.1")
+        created_session = await session_service.create("A booking system", "en", "127.0.0.1")
+        session = created_session.session
         await session_service.transition(session.id, SessionStatus.ANALYZING)
         workflow = DiagramSessionWorkflow(
             session_service,
             FakeSessionJobDispatcher(),
-            ClarificationService(FakeStructuredLlmClient(ClarificationResult()), 7),
             DiagramService(CancellingStructuredLlmClient(session_service, session.id)),
-            max_clarification_rounds=3,
         )
 
         with pytest.raises(SessionNotFound):
@@ -77,14 +74,28 @@ class CancellingStructuredLlmClient:
             ResponseModel,
             Diagram(
                 schema_version="1.0",
-                system=DiagramSystem(id="booking-system", name="Booking system"),
-                actors=[Actor(id="client", name="Client", type=ActorType.PRIMARY)],
-                use_cases=[UseCase(id="book-service", name="Book service")],
+                system=DiagramSystem(
+                    id="booking-system", name="Booking system", spans=[], origin="unverified"
+                ),
+                actors=[
+                    Actor(
+                        id="client",
+                        name="Client",
+                        type=ActorType.PRIMARY,
+                        spans=[],
+                        origin="unverified",
+                    )
+                ],
+                use_cases=[
+                    UseCase(id="book-service", name="Book service", spans=[], origin="unverified")
+                ],
                 relations=[
                     DiagramRelation(
                         type=RelationType.ASSOCIATION,
                         source_id="client",
                         target_id="book-service",
+                        spans=[],
+                        origin="unverified",
                     )
                 ],
                 assumptions=[],

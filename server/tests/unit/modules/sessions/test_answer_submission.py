@@ -25,7 +25,8 @@ def test_answers_must_match_the_current_questions() -> None:
             20_000,
             2_000,
         )
-        session, _ = await service.create("A booking system", "en", "127.0.0.1")
+        created_session = await service.create("A booking system", "en", "127.0.0.1")
+        session = created_session.session
         await service.transition(session.id, SessionStatus.ANALYZING)
         await service.save_clarification_result(
             session.id,

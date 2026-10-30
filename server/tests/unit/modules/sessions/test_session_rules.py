@@ -24,7 +24,8 @@ def test_session_rejects_an_invalid_status_transition() -> None:
             20_000,
             2_000,
         )
-        session, _ = await service.create("A booking system", "en", "127.0.0.1")
+        created_session = await service.create("A booking system", "en", "127.0.0.1")
+        session = created_session.session
 
         with pytest.raises(InvalidSessionState):
             await service.transition(session.id, SessionStatus.DIAGRAM_READY)
@@ -44,7 +45,8 @@ def test_session_requires_its_matching_access_token() -> None:
             20_000,
             2_000,
         )
-        session, _ = await service.create("A booking system", "en", "127.0.0.1")
+        created_session = await service.create("A booking system", "en", "127.0.0.1")
+        session = created_session.session
 
         with pytest.raises(InvalidSessionToken):
             await service.get_authorized(session.id, "another-token")
