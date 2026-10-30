@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from app.api.schemas.diagram_sessions import ApiSchema
 
@@ -27,6 +27,17 @@ class ProjectResponse(ProjectMetadataResponse):
 
 class UpdateProjectRequest(ApiSchema):
     document_xml: str = Field(min_length=1, max_length=2_000_000, validation_alias="documentXml")
+
+
+class RenameProjectRequest(ApiSchema):
+    name: str = Field(min_length=1, max_length=120)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Project name cannot be blank")
+        return value.strip()
 
 
 class AvailableProjectAccess(ApiSchema):

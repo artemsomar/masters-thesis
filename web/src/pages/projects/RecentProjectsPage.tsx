@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Clock3, FolderOpen, LoaderCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LoaderCircle } from 'lucide-react';
 import { getAvailableProjects } from '../../api/projects';
 import { ProjectSidebar } from '../../components/layout/ProjectSidebar';
 import { getProjectAccesses } from '../../lib/projects/project-access';
 import { queryKeys } from '../../api/query-keys';
 import styles from './RecentProjectsPage.module.scss';
+import { RecentProjectCard } from './RecentProjectCard';
 
 export const RecentProjectsPage = () => {
   const access = getProjectAccesses();
@@ -31,17 +31,7 @@ export const RecentProjectsPage = () => {
         ) : null}
         <div className={styles.list}>
           {available.map((project) => (
-            <article className={styles.card} key={project.projectId}>
-              <FolderOpen size={22} />
-              <div>
-                <h2>{project.name}</h2>
-                <span>
-                  <Clock3 size={13} />
-                  Updated {new Date(project.updatedAt).toLocaleString()}
-                </span>
-              </div>
-              <Link to={`/editor/${project.projectId}`}>Open</Link>
-            </article>
+            <RecentProjectCard key={project.projectId} project={project} />
           ))}
         </div>
         {projects.isError ? (

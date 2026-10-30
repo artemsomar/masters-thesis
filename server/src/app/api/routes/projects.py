@@ -7,6 +7,7 @@ from app.api.schemas.projects import (
     CreateProjectResponse,
     ProjectMetadataResponse,
     ProjectResponse,
+    RenameProjectRequest,
     UpdateProjectRequest,
 )
 from app.bootstrap import ApplicationContainer
@@ -79,6 +80,15 @@ async def update_project(
         project.id, request.document_xml
     )
     return metadata_response(updated_project)
+
+
+@router.patch("/{project_id}", response_model=ProjectMetadataResponse)
+async def rename_project(
+    request: RenameProjectRequest,
+    project: Project = Depends(get_authorized_project),
+    container: ApplicationContainer = Depends(get_container),
+) -> ProjectMetadataResponse:
+    return metadata_response(await container.project_service.rename(project.id, request.name))
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -39,10 +39,16 @@ class ProjectService:
         return project
 
     async def update_document(self, project_id: str, document_xml: str) -> Project:
-        project = await self.get(project_id)
-        project.document_xml = document_xml
-        project.updated_at = datetime.now(UTC)
-        if not await self._repository.save_existing(project):
+        project = await self._repository.update(
+            project_id, datetime.now(UTC), document_xml=document_xml
+        )
+        if project is None:
+            raise ProjectNotFound()
+        return project
+
+    async def rename(self, project_id: str, name: str) -> Project:
+        project = await self._repository.update(project_id, datetime.now(UTC), name=name)
+        if project is None:
             raise ProjectNotFound()
         return project
 
@@ -52,15 +58,11 @@ class ProjectService:
             raise ProjectNotFound()
         return project
 
-    async def get_available(
-        self, project_access: list[ProjectAccessCredentials]
-    ) -> list[Project]:
+    async def get_available(self, project_access: list[ProjectAccessCredentials]) -> list[Project]:
         available: list[Project] = []
         for access in project_access:
             try:
-                available.append(
-                    await self.get_authorized(access.project_id, access.project_token)
-                )
+                available.append(await self.get_authorized(access.project_id, access.project_token))
             except (ProjectNotFound, InvalidProjectToken):
                 continue
         return available

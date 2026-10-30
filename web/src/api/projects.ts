@@ -29,3 +29,14 @@ export const getAvailableProjects = (
     method: 'POST',
     body: JSON.stringify({ projects }),
   });
+
+export const renameProject = (
+  projectId: string,
+  projectToken: string,
+  name: string,
+): Promise<Omit<Project, 'documentXml'>> =>
+  request(`/api/v1/projects/${projectId}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${projectToken}` },
+    body: JSON.stringify({ name }),
+  });
