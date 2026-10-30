@@ -43,6 +43,20 @@ export const DiagramCanvas = ({ stageRef }: Props) => {
         scaleX={viewport.scale}
         scaleY={viewport.scale}
         draggable={canvas.activeTool === 'pan'}
+        onWheel={(event) => {
+          const wheel = event.evt;
+          // Leave browser zoom and trackpad pinch gestures to the browser.
+          if (wheel.ctrlKey || wheel.metaKey) return;
+          wheel.preventDefault();
+          const unitX = wheel.deltaMode === 2 ? size.width : wheel.deltaMode === 1 ? 16 : 1;
+          const unitY = wheel.deltaMode === 2 ? size.height : wheel.deltaMode === 1 ? 16 : 1;
+          const horizontalOnly = wheel.shiftKey && wheel.deltaX === 0;
+          const deltaX = (horizontalOnly ? wheel.deltaY : wheel.deltaX) * unitX;
+          const deltaY = horizontalOnly ? 0 : wheel.deltaY * unitY;
+          // Wheel events can arrive faster than React renders the next frame.
+          const current = useEditorUiStore.getState().viewport;
+          setViewport({ ...current, x: current.x - deltaX, y: current.y - deltaY });
+        }}
         onDragStart={(event) => {
           if (event.target === stageRef.current)
             useEditorUiStore.getState().setInteraction({ mode: 'panning' });
