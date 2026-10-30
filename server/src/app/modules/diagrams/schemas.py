@@ -2,6 +2,7 @@ from typing import Annotated, Literal
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
+from app.modules.diagrams.contracts.provenance import Origin, SourceSpan
 from app.modules.diagrams.enums import ActorType, RelationType
 
 DiagramIdentifier = Annotated[
@@ -14,13 +15,22 @@ class DiagramSchema(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ProvenancedDiagramSchema(DiagramSchema):
+    spans: list[SourceSpan] = Field(
+        description="Exact source fragments supporting this element; empty when no source is available.",
+    )
+    origin: Origin = Field(
+        description="extracted, unverified, or derived:<requirement-frame-id>.",
+    )
+
+
 class DiagramGenerationRequest(DiagramSchema):
     description: str = Field(min_length=1)
     language: str = Field(min_length=2, max_length=10)
     clarification_context: str = Field(min_length=1)
 
 
-class DiagramSystem(DiagramSchema):
+class DiagramSystem(ProvenancedDiagramSchema):
     id: DiagramIdentifier = Field(
         description="A stable kebab-case identifier for the system boundary.",
     )
@@ -31,7 +41,7 @@ class DiagramSystem(DiagramSchema):
     )
 
 
-class Actor(DiagramSchema):
+class Actor(ProvenancedDiagramSchema):
     id: DiagramIdentifier = Field(
         description="A stable kebab-case identifier that is unique across actors and use cases.",
     )
@@ -45,7 +55,7 @@ class Actor(DiagramSchema):
     )
 
 
-class UseCase(DiagramSchema):
+class UseCase(ProvenancedDiagramSchema):
     id: DiagramIdentifier = Field(
         description="A stable kebab-case identifier that is unique across actors and use cases.",
     )
@@ -56,7 +66,7 @@ class UseCase(DiagramSchema):
     )
 
 
-class DiagramRelation(DiagramSchema):
+class DiagramRelation(ProvenancedDiagramSchema):
     type: RelationType = Field(
         description="The UML relationship type: association, include, extend, or generalization.",
     )
