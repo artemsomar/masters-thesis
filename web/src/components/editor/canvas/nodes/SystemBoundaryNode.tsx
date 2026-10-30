@@ -41,7 +41,7 @@ export const SystemBoundaryNode = ({
       text={node.name}
       x={14}
       y={12}
-      fontSize={13}
+      fontSize={node.style.fontSize ?? 13}
       fontStyle="bold"
       fill={node.style.textColor}
     />

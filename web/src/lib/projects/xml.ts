@@ -15,6 +15,7 @@ type XmlNode = {
   '@_fill'?: string;
   '@_stroke'?: string;
   '@_textColor'?: string;
+  '@_fontSize'?: string;
   description?: string;
 };
 
@@ -23,6 +24,8 @@ type XmlRelation = {
   '@_type': DiagramRelation['type'];
   '@_sourceId': string;
   '@_targetId': string;
+  '@_sourceAngle'?: string;
+  '@_targetAngle'?: string;
 };
 
 const asArray = <T>(value: T | T[] | undefined): T[] =>
@@ -46,12 +49,11 @@ export const documentToXml = (document: DiagramDocument): string => {
           '@_name': node.name,
           '@_x': node.position.x,
           '@_y': node.position.y,
-          ...(node.kind === 'boundary'
-            ? { '@_width': node.size.width, '@_height': node.size.height }
-            : {}),
+          ...(node.size ? { '@_width': node.size.width, '@_height': node.size.height } : {}),
           '@_fill': node.style.fill,
           '@_stroke': node.style.stroke,
           '@_textColor': node.style.textColor,
+          ...(node.style.fontSize !== undefined ? { '@_fontSize': node.style.fontSize } : {}),
           ...(node.kind === 'boundary' ? {} : { description: node.description }),
         })),
       },
@@ -61,6 +63,8 @@ export const documentToXml = (document: DiagramDocument): string => {
           '@_type': relation.type,
           '@_sourceId': relation.sourceId,
           '@_targetId': relation.targetId,
+          ...(relation.sourceAngle !== undefined ? { '@_sourceAngle': relation.sourceAngle } : {}),
+          ...(relation.targetAngle !== undefined ? { '@_targetAngle': relation.targetAngle } : {}),
         })),
       },
     },
@@ -85,10 +89,17 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
   if (root['@_version'] !== '1.0') throw new Error('The project uses an unsupported XML version.');
   const document = createEmptyDocument();
   document.nodes = asArray(root.nodes?.node).map((node) => {
+    const fontSize =
+      node['@_fontSize'] !== undefined
+        ? asFiniteNumber(node['@_fontSize'], 'font size')
+        : undefined;
+    if (fontSize !== undefined && (fontSize < 6 || fontSize > 96))
+      throw new Error('Font size must be between 6 and 96 pixels.');
     const style = {
       fill: node['@_fill'] ?? defaultStyle.fill,
       stroke: node['@_stroke'] ?? defaultStyle.stroke,
       textColor: node['@_textColor'] ?? defaultStyle.textColor,
+      ...(fontSize !== undefined ? { fontSize } : {}),
     };
     const position = {
       x: asFiniteNumber(node['@_x'], 'element x coordinate'),
@@ -106,6 +117,13 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
         },
         style,
       };
+    const hasSize = node['@_width'] !== undefined || node['@_height'] !== undefined;
+    const size = hasSize
+      ? {
+          width: asFiniteNumber(node['@_width'], 'element width'),
+          height: asFiniteNumber(node['@_height'], 'element height'),
+        }
+      : undefined;
     if (node['@_kind'] === 'actor' || node['@_kind'] === 'useCase')
       return {
         id: node['@_id'],
@@ -113,6 +131,7 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
         name: node['@_name'],
         position,
         description: node.description ?? '',
+        ...(size ? { size } : {}),
         style,
       };
     throw new Error('The project contains an unsupported diagram element.');
@@ -125,6 +144,16 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
       type: relation['@_type'],
       sourceId: relation['@_sourceId'],
       targetId: relation['@_targetId'],
+      ...(relation['@_sourceAngle'] !== undefined
+        ? {
+            sourceAngle: asFiniteNumber(relation['@_sourceAngle'], 'source attachment angle'),
+          }
+        : {}),
+      ...(relation['@_targetAngle'] !== undefined
+        ? {
+            targetAngle: asFiniteNumber(relation['@_targetAngle'], 'target attachment angle'),
+          }
+        : {}),
     };
   });
   const nodeIds = new Set<string>();
@@ -133,8 +162,8 @@ export const xmlToDocument = (xml: string): DiagramDocument => {
     if (nodeIds.has(node.id)) throw new Error('The project contains duplicate element IDs.');
     if (!Number.isFinite(node.position.x) || !Number.isFinite(node.position.y))
       throw new Error('The project contains invalid element coordinates.');
-    if (node.kind === 'boundary' && (node.size.width <= 0 || node.size.height <= 0))
-      throw new Error('A system boundary must have a positive width and height.');
+    if (node.size && (node.size.width <= 0 || node.size.height <= 0))
+      throw new Error('A diagram element must have a positive width and height.');
     nodeIds.add(node.id);
   }
   const relationIds = new Set<string>();

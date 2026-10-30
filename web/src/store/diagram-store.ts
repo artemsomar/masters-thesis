@@ -30,6 +30,7 @@ type DiagramState = {
   updateRelation: (id: string, changes: Partial<Omit<DiagramRelation, 'id'>>) => void;
   beginInteraction: () => void;
   moveNodeLive: (id: string, position: Point) => void;
+  resizeNodeLive: (id: string, position: Point, size: { width: number; height: number }) => void;
   commitInteraction: () => void;
   undo: () => void;
   redo: () => void;
@@ -97,6 +98,15 @@ export const useDiagramStore = create<DiagramState>()((set) => ({
       document: {
         ...state.document,
         nodes: state.document.nodes.map((node) => (node.id === id ? { ...node, position } : node)),
+      },
+    })),
+  resizeNodeLive: (id, position, size) =>
+    set((state) => ({
+      document: {
+        ...state.document,
+        nodes: state.document.nodes.map((node) =>
+          node.id === id ? { ...node, position, size } : node,
+        ),
       },
     })),
   commitInteraction: () =>

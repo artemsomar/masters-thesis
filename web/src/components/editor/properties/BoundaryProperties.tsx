@@ -23,6 +23,7 @@ export const BoundaryProperties = ({ node, onUpdate, onStyleChange }: Props) => 
         <input
           type="number"
           min="120"
+          key={`width-${node.size.width}`}
           defaultValue={node.size.width}
           onBlur={(event) =>
             onUpdate({
@@ -39,6 +40,7 @@ export const BoundaryProperties = ({ node, onUpdate, onStyleChange }: Props) => 
         <input
           type="number"
           min="100"
+          key={`height-${node.size.height}`}
           defaultValue={node.size.height}
           onBlur={(event) =>
             onUpdate({

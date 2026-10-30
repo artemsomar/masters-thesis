@@ -1,4 +1,6 @@
 import type { DiagramNode } from '../../types/diagram';
+import { getUseCaseLayout } from './use-case-layout';
+import { getActorLayout } from './actor-layout';
 
 export type Bounds = { x: number; y: number; width: number; height: number };
 
@@ -10,9 +12,12 @@ export const getNodeBounds = (node: DiagramNode): Bounds => {
       width: node.size.width,
       height: node.size.height,
     };
-  if (node.kind === 'useCase')
-    return { x: node.position.x - 82, y: node.position.y - 35, width: 164, height: 70 };
-  return { x: node.position.x - 52, y: node.position.y - 40, width: 104, height: 64 };
+  if (node.kind === 'useCase') {
+    const { width, height } = getUseCaseLayout(node.name, node.size, node.style.fontSize);
+    return { x: node.position.x - width / 2, y: node.position.y - height / 2, width, height };
+  }
+  const { width, height, top } = getActorLayout(node);
+  return { x: node.position.x - width / 2, y: node.position.y + top, width, height };
 };
 
 export const getNodeCenter = (node: DiagramNode) => {

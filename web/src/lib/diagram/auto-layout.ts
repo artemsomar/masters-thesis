@@ -1,13 +1,11 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
+import { getNodeBounds } from './geometry';
 import type { DiagramDocument, DiagramNode } from '../../types/diagram';
 
 const elk = new ELK();
-const actorSize = { width: 110, height: 72 };
-const useCaseSize = { width: 164, height: 70 };
 const canvasPadding = 120;
 
-const sizeForNode = (node: DiagramNode): { width: number; height: number } =>
-  node.kind === 'actor' ? actorSize : useCaseSize;
+const sizeForNode = (node: DiagramNode): { width: number; height: number } => getNodeBounds(node);
 
 export const autoLayoutDocument = async (document: DiagramDocument): Promise<DiagramDocument> => {
   const layoutNodes = document.nodes.filter((node) => node.kind !== 'boundary');
@@ -43,10 +41,11 @@ export const autoLayoutDocument = async (document: DiagramDocument): Promise<Dia
   });
   const useCases = laidOutNodes.filter((node) => node.kind === 'useCase');
   if (!useCases.length) return { ...document, nodes: laidOutNodes };
-  const left = Math.min(...useCases.map((node) => node.position.x - useCaseSize.width / 2));
-  const right = Math.max(...useCases.map((node) => node.position.x + useCaseSize.width / 2));
-  const top = Math.min(...useCases.map((node) => node.position.y - useCaseSize.height / 2));
-  const bottom = Math.max(...useCases.map((node) => node.position.y + useCaseSize.height / 2));
+  const bounds = useCases.map(getNodeBounds);
+  const left = Math.min(...bounds.map((bound) => bound.x));
+  const right = Math.max(...bounds.map((bound) => bound.x + bound.width));
+  const top = Math.min(...bounds.map((bound) => bound.y));
+  const bottom = Math.max(...bounds.map((bound) => bound.y + bound.height));
 
   return {
     ...document,

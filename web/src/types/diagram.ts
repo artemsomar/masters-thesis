@@ -4,6 +4,7 @@ export type NodeStyle = {
   fill: string;
   stroke: string;
   textColor: string;
+  fontSize?: number;
 };
 
 type BaseNode = {
@@ -11,6 +12,7 @@ type BaseNode = {
   name: string;
   position: Point;
   style: NodeStyle;
+  size?: { width: number; height: number };
 };
 
 export type ActorNode = BaseNode & {
@@ -36,6 +38,8 @@ export type DiagramRelation = {
   type: RelationType;
   sourceId: string;
   targetId: string;
+  sourceAngle?: number;
+  targetAngle?: number;
 };
 
 export type DiagramDocument = {

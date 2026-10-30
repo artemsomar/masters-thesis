@@ -4,17 +4,22 @@ import { ConnectionPreview } from '../interactions/ConnectionPreview';
 import { SelectionMarquee } from '../interactions/SelectionMarquee';
 import { SelectionTransformer } from '../interactions/SelectionTransformer';
 
-type Props = { selectedNodes: DiagramNode[]; nodes: DiagramNode[]; interaction: CanvasInteraction };
+type Props = {
+  selectedNodes: DiagramNode[];
+  nodes: DiagramNode[];
+  interaction: CanvasInteraction;
+  resizingEnabled: boolean;
+};
 
-export const InteractionLayer = ({ selectedNodes, nodes, interaction }: Props) => {
+export const InteractionLayer = ({ selectedNodes, nodes, interaction, resizingEnabled }: Props) => {
   const source =
     interaction.mode === 'connecting'
       ? nodes.find((node) => node.id === interaction.sourceId)
       : undefined;
   return (
-    <Layer name="interaction-layer" listening={false}>
+    <Layer name="interaction-layer">
       {selectedNodes.map((node) => (
-        <SelectionTransformer key={node.id} node={node} />
+        <SelectionTransformer key={node.id} node={node} enabled={resizingEnabled} />
       ))}
       {interaction.mode === 'marquee' ? (
         <SelectionMarquee start={interaction.start} end={interaction.end} />
