@@ -16,10 +16,24 @@ export const PropertiesPanel = ({ element }: Props) => {
   const nodes = useDiagramStore((state) => state.document.nodes);
   const isRelation = element && 'sourceId' in element;
   return (
-    <aside className={styles.panel}>
+    <aside
+      className={styles.panel}
+      data-properties-panel
+      onKeyDown={(event) => {
+        if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+        const field = event.target;
+        const singleLine =
+          field instanceof HTMLInputElement && ['text', 'number'].includes(field.type);
+        const multiline = field instanceof HTMLTextAreaElement && (event.ctrlKey || event.metaKey);
+        if (singleLine || multiline) {
+          event.preventDefault();
+          field.blur();
+        }
+      }}
+    >
       <span className={styles.eyebrow}>Properties</span>
       {element ? (
-        <div className={styles.content}>
+        <div key={element.id} className={styles.content}>
           <span className={styles.type}>{isRelation ? 'Relation' : element.kind}</span>
           {isRelation ? (
             <RelationProperties

@@ -30,7 +30,16 @@ export const EditorWorkspace = ({ projectId, projectToken, documentXml, projectN
     document.relations.find((relation) => relation.id === selectedIds[0]);
 
   return (
-    <section className={styles.workspace}>
+    <section
+      className={styles.workspace}
+      onPointerDownCapture={(event) => {
+        // Commit the focused field before a canvas selection can unmount it.
+        const focused = event.currentTarget.ownerDocument.activeElement;
+        const panel = focused?.closest('[data-properties-panel]');
+        if (panel && !panel.contains(event.target as Node) && focused instanceof HTMLElement)
+          focused.blur();
+      }}
+    >
       <EditorHeader projectName={projectName} {...autosave} />
       <div className={styles.editorBody}>
         <div className={styles.canvasArea}>
