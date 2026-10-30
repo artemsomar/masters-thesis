@@ -1,3 +1,10 @@
+upstream diagram_api {
+    zone diagram_api 64k;
+    # Docker DNS tracks the API when its container is recreated.
+    resolver 127.0.0.11 valid=5s ipv6=off;
+    server ${API_HOST}:${API_PORT} resolve;
+}
+
 server {
     listen 8080;
     server_name _;
@@ -6,7 +13,7 @@ server {
     index index.html;
 
     location /api/ {
-        proxy_pass http://${API_HOST}:${API_PORT};
+        proxy_pass http://diagram_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
