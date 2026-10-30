@@ -43,8 +43,16 @@ export const DiagramCanvas = ({ stageRef }: Props) => {
         scaleX={viewport.scale}
         scaleY={viewport.scale}
         draggable={canvas.activeTool === 'pan'}
-        onDragStart={() => useEditorUiStore.getState().setInteraction({ mode: 'panning' })}
+        onDragStart={(event) => {
+          if (event.target === stageRef.current)
+            useEditorUiStore.getState().setInteraction({ mode: 'panning' });
+        }}
+        onDragMove={(event) => {
+          if (event.target !== stageRef.current) return;
+          setViewport({ x: event.target.x(), y: event.target.y(), scale: viewport.scale });
+        }}
         onDragEnd={(event) => {
+          if (event.target !== stageRef.current) return;
           setViewport({ x: event.target.x(), y: event.target.y(), scale: viewport.scale });
           useEditorUiStore.getState().setInteraction({ mode: 'idle' });
         }}
@@ -57,7 +65,12 @@ export const DiagramCanvas = ({ stageRef }: Props) => {
         onMouseMove={(event) => canvas.handleStageMouseMove(event.target.getStage()!)}
         onMouseUp={canvas.handleStageMouseUp}
       >
-        <GridLayer width={size.width / viewport.scale} height={size.height / viewport.scale} />
+        <GridLayer
+          x={-viewport.x / viewport.scale}
+          y={-viewport.y / viewport.scale}
+          width={size.width / viewport.scale}
+          height={size.height / viewport.scale}
+        />
         <DiagramLayer
           nodes={nodes}
           relations={relations}
@@ -73,6 +86,7 @@ export const DiagramCanvas = ({ stageRef }: Props) => {
           selectedNodes={nodes.filter((node) => selectedIds.includes(node.id))}
           nodes={nodes}
           interaction={canvas.interaction}
+          resizingEnabled={canvas.activeTool === 'select'}
         />
       </Stage>
     </div>
