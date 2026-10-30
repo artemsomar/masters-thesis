@@ -1,11 +1,19 @@
 import logging
+from pathlib import Path
 
 import structlog
 
 
-def configure_logging(log_level: str) -> None:
+def configure_logging(log_level: str, log_file_path: str) -> None:
     level = getattr(logging, log_level.upper(), logging.INFO)
-    logging.basicConfig(format="%(message)s", level=level, force=True)
+    path = Path(log_file_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        format="%(message)s",
+        level=level,
+        handlers=[logging.StreamHandler(), logging.FileHandler(path, encoding="utf-8")],
+        force=True,
+    )
 
     structlog.configure(
         processors=[

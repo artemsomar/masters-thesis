@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     environment: str = "development"
     log_level: str = "INFO"
+    log_file_path: str = "logs/pipeline.jsonl"
     redis_url: RedisDsn = RedisDsn("redis://localhost:6379/0")
     rq_queue_name: str = "diagram-jobs"
     session_ttl_seconds: int = 86_400
@@ -19,6 +20,13 @@ class Settings(BaseSettings):
     gemini_model: str = ""
     gemini_embedding_model: str = ""
     gemini_embedding_dimensions: Annotated[int, Field(ge=1)] = 768
+    requirement_graph_similarity_threshold: Annotated[float, Field(ge=0, le=1)] = 0.85
+    new_diagram_pipeline_enabled: bool = True
+    evaluation_dataset_path: str = "data"
+    evaluation_actor_similarity_threshold: Annotated[float, Field(ge=0, le=1)] = 0.8
+    evaluation_use_case_similarity_threshold: Annotated[float, Field(ge=0, le=1)] = 0.8
+    evaluation_run_ttl_seconds: int = 86_400
+    evaluation_job_timeout_seconds: Annotated[int, Field(ge=1)] = 1_800
     max_clarification_rounds: Annotated[int, Field(ge=1)] = 3
     max_questions_per_round: Annotated[int, Field(ge=1)] = 7
     max_description_length: Annotated[int, Field(ge=1)] = 20_000
