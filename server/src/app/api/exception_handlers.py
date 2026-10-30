@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.errors import AppError
+from app.modules.evaluation.errors import EvaluationDatasetNotFound
+from app.modules.evaluation.run_errors import EvaluationRunNotFound
 from app.modules.sessions.errors import (
     InvalidQuestionRound,
     InvalidSessionState,
@@ -15,7 +17,9 @@ from app.modules.projects.errors import InvalidProjectToken, ProjectNotFound
 
 
 def status_code_for(error: AppError) -> int:
-    if isinstance(error, (SessionNotFound, ProjectNotFound)):
+    if isinstance(
+        error, (SessionNotFound, ProjectNotFound, EvaluationRunNotFound, EvaluationDatasetNotFound)
+    ):
         return 404
     if isinstance(error, (InvalidSessionToken, InvalidProjectToken)):
         return 401

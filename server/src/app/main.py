@@ -10,6 +10,7 @@ from starlette.responses import Response
 
 from app.api.exception_handlers import register_exception_handlers
 from app.api.routes.diagram_sessions import router as diagram_sessions_router
+from app.api.routes.evaluation_runs import router as evaluation_runs_router
 from app.api.routes.health import router as health_router
 from app.api.routes.projects import router as projects_router
 from app.bootstrap import ApplicationContainer, build_container
@@ -53,6 +54,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health_router)
     app.include_router(diagram_sessions_router)
     app.include_router(projects_router)
+    app.include_router(evaluation_runs_router)
     return app
 
 
