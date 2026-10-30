@@ -9,6 +9,7 @@ dependencies = [
   "faiss-cpu (>=1.12,<2.0)",
   "google-genai (>=1.33,<2.0)",
   "numpy (>=2.0,<3.0)",
+  "networkx (>=3.4,<4.0)",
   "pydantic-settings (>=2.7,<3.0)",
   "redis (>=5.2,<7.0)",
   "rq (>=2.3,<3.0)",
@@ -26,6 +27,7 @@ dev = [
   "httpx (>=0.28,<1.0)",
   "mypy (>=1.15,<2.0)",
   "pytest (>=8.3,<10.0)",
+  "types-networkx (>=3.6,<4.0)",
 ]
 
 [tool.black]
