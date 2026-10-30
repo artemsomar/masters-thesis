@@ -13,6 +13,7 @@ export const BoundaryProperties = ({ node, onUpdate, onStyleChange }: Props) => 
     <label className={styles.field}>
       System name
       <input
+        key={node.name}
         defaultValue={node.name}
         onBlur={(event) => onUpdate({ name: event.target.value.trim() || node.name })}
       />

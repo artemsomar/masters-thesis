@@ -13,6 +13,7 @@ export const ActorProperties = ({ node, onUpdate, onStyleChange }: Props) => (
     <label className={styles.field}>
       Name
       <input
+        key={node.name}
         defaultValue={node.name}
         onBlur={(event) => onUpdate({ name: event.target.value.trim() || node.name })}
       />
@@ -20,6 +21,7 @@ export const ActorProperties = ({ node, onUpdate, onStyleChange }: Props) => (
     <label className={styles.field}>
       Description
       <textarea
+        key={node.description}
         defaultValue={node.description}
         rows={4}
         onBlur={(event) => onUpdate({ description: event.target.value })}

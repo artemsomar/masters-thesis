@@ -37,13 +37,17 @@ type DiagramState = {
   redo: () => void;
 };
 
-const commit = (state: DiagramState, document: DiagramDocument) => ({
-  document,
-  revision: state.revision + 1,
-  past: [...state.past, state.document],
-  future: [],
-  interactionSnapshot: undefined,
-});
+const commit = (state: DiagramState, document: DiagramDocument) => {
+  // Merely blurring an unchanged field must not add history or discard Redo.
+  if (JSON.stringify(document) === JSON.stringify(state.document)) return state;
+  return {
+    document,
+    revision: state.revision + 1,
+    past: [...state.past, state.document],
+    future: [],
+    interactionSnapshot: undefined,
+  };
+};
 
 export const useDiagramStore = create<DiagramState>()((set) => ({
   document: createEmptyDocument(),
@@ -51,7 +55,8 @@ export const useDiagramStore = create<DiagramState>()((set) => ({
   past: [],
   future: [],
   interactionSnapshot: undefined,
-  setDocument: (document) => set({ document, revision: 0, past: [], future: [] }),
+  setDocument: (document) =>
+    set({ document, revision: 0, past: [], future: [], interactionSnapshot: undefined }),
   addNode: (node) =>
     set((state) => commit(state, { ...state.document, nodes: [...state.document.nodes, node] })),
   updateNode: (id, changes) =>
